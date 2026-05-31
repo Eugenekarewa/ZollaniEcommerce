@@ -130,6 +130,9 @@ export default function AboutPage() {
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <a
                 href="/documents/zollani-tech-company-profile.pdf"
+                download="Zollani Tech Company Profile.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary gap-2"
               >
                 Download Company Profile
