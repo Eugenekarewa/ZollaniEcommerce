@@ -21,6 +21,7 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [form, setForm] = useState({
     name: '', email: '', phone: '', company: '', service: '', message: '',
   });
@@ -35,6 +36,7 @@ export default function ContactForm() {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
+    setFieldErrors({});
 
     try {
       const res = await fetch('/api/contact', {
@@ -46,6 +48,7 @@ export default function ContactForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.issues) setFieldErrors(data.issues);
         throw new Error(data.error ?? 'Something went wrong.');
       }
 
@@ -76,6 +79,12 @@ export default function ContactForm() {
     );
   }
 
+  function fieldError(key: string) {
+    const errs = fieldErrors[key];
+    if (!errs?.length) return null;
+    return <p className="mt-1 text-xs text-red-600">{errs[0]}</p>;
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {status === 'error' && (
@@ -95,11 +104,13 @@ export default function ContactForm() {
             name="name"
             type="text"
             required
+            minLength={2}
             value={form.name}
             onChange={handleChange}
             placeholder="Jane Mwangi"
             className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
           />
+          {fieldError('name')}
         </div>
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-charcoal">
@@ -115,6 +126,7 @@ export default function ContactForm() {
             placeholder="jane@company.co.ke"
             className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
           />
+          {fieldError('email')}
         </div>
       </div>
 
@@ -165,6 +177,7 @@ export default function ContactForm() {
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
+        {fieldError('service')}
       </div>
 
       <div>
@@ -175,12 +188,14 @@ export default function ContactForm() {
           id="message"
           name="message"
           required
+          minLength={10}
           rows={5}
           value={form.message}
           onChange={handleChange}
           placeholder="Describe your technology needs or the issue you're experiencing…"
           className="mt-1.5 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
         />
+        {fieldError('message')}
       </div>
 
       <button
