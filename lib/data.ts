@@ -10,7 +10,7 @@ export const siteConfig = {
   phone: '+254 768 551914',
   whatsapp: '+254 768 551914',
   address: 'Thika Road, Muthaiga Business Centre, Former Shell Petrol Station, Nairobi',
-  storeUrl: 'https://shop.zollani.co.ke',
+  storeUrl: 'https://zollani-store.vercel.app/',
   social: {
     twitter:   'https://twitter.com/zollanitech',
     linkedin:  'https://linkedin.com/company/zollanitech',
