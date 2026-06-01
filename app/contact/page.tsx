@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 import { siteConfig } from '@/lib/data';
+import ContactForm from '@/components/contact/ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
   description:
-    'Get in touch with Zollani Tech Limited. Request a quote, book a consultation, or reach us by phone, email, or WhatsApp.',
+    'Get in touch with Zollani Tech. Request a quote, book a consultation, or reach us by phone, email, or WhatsApp in Nairobi.',
 };
 
 const contactMethods = [
@@ -36,21 +37,11 @@ const contactMethods = [
   {
     icon: <MapPin className="h-6 w-6" />,
     label: 'Location',
-    value: siteConfig.address,
+    value: 'Muthaiga Business Centre',
     href: 'https://maps.google.com/?q=Muthaiga+Business+Centre+Thika+Road+Nairobi',
-    desc: 'Visit us by appointment',
+    desc: 'Thika Road, Former Shell Petrol Station',
     color: 'teal',
   },
-];
-
-const serviceOptions = [
-  'Electronics Repair',
-  'IT Support',
-  'Networking',
-  'Security Solutions',
-  'Technology Consulting',
-  'Foundation / Community',
-  'Other',
 ];
 
 export default function ContactPage() {
@@ -66,8 +57,8 @@ export default function ContactPage() {
             Let&apos;s Talk Technology
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-gray-400">
-            Tell us about your technology needs. We&apos;ll get back to you with a clear plan
-            and honest pricing.
+            Tell us about your technology needs. We&apos;ll get back to you within 24 hours
+            with a clear plan and honest pricing.
           </p>
         </div>
       </section>
@@ -79,95 +70,20 @@ export default function ContactPage() {
             {/* Contact form — 3 cols */}
             <div className="lg:col-span-3">
               <h2 className="text-xl font-bold text-charcoal">Send us a message</h2>
-              <p className="mt-1 text-sm text-gray-500">We respond within 24 hours on business days.</p>
-
-              <form className="mt-8 space-y-5">
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal">
-                      Full Name <span className="text-coral">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Jane Mwangi"
-                      className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal">
-                      Email Address <span className="text-coral">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="jane@company.co.ke"
-                      className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-charcoal">Phone Number</label>
-                  <input
-                    type="tel"
-                    placeholder="+254 700 000 000"
-                    className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-charcoal">
-                    Organization / Company
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Your company or school"
-                    className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-charcoal">
-                    Service Required <span className="text-coral">*</span>
-                  </label>
-                  <select
-                    required
-                    className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
-                  >
-                    <option value="">Select a service…</option>
-                    {serviceOptions.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-charcoal">
-                    Message <span className="text-coral">*</span>
-                  </label>
-                  <textarea
-                    required
-                    rows={5}
-                    placeholder="Describe your technology needs or the issue you're experiencing…"
-                    className="mt-1.5 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
-                  />
-                </div>
-
-                <button type="submit" className="btn-primary w-full py-3.5">
-                  Send Message
-                </button>
-
-                <p className="text-center text-xs text-gray-400">
-                  By submitting, you agree to our Privacy Policy. We never share your data.
-                </p>
-              </form>
+              <p className="mt-1 text-sm text-gray-500">
+                We respond within 24 hours on business days.
+              </p>
+              <div className="mt-8">
+                <ContactForm />
+              </div>
             </div>
 
             {/* Contact info — 2 cols */}
             <div className="lg:col-span-2">
               <h2 className="text-xl font-bold text-charcoal">Other ways to reach us</h2>
-              <p className="mt-1 text-sm text-gray-500">Pick the channel that works best for you.</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Pick the channel that works best for you.
+              </p>
 
               <div className="mt-8 space-y-4">
                 {contactMethods.map((method) => (
@@ -184,7 +100,9 @@ export default function ContactPage() {
                   >
                     <div
                       className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                        method.color === 'coral' ? 'bg-coral-50 text-coral' : 'bg-teal-50 text-teal'
+                        method.color === 'coral'
+                          ? 'bg-coral-50 text-coral'
+                          : 'bg-teal-50 text-teal'
                       }`}
                     >
                       {method.icon}
@@ -205,14 +123,15 @@ export default function ContactPage() {
                 <div className="flex h-48 items-center justify-center bg-gray-50">
                   <div className="text-center text-sm text-gray-400">
                     <MapPin className="mx-auto mb-2 h-8 w-8 text-coral" />
-                    <p className="font-medium">Nairobi, Kenya</p>
+                    <p className="font-medium text-charcoal">Muthaiga Business Centre</p>
+                    <p className="text-xs">Thika Road, Former Shell Petrol Station</p>
                     <a
-                      href="https://maps.google.com/?q=Nairobi+Kenya"
+                      href="https://maps.google.com/?q=Muthaiga+Business+Centre+Thika+Road+Nairobi"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-1 block text-xs text-coral underline underline-offset-2"
                     >
-                      Muthaiga Business Centre, Thika Road →
+                      Open in Google Maps →
                     </a>
                   </div>
                 </div>

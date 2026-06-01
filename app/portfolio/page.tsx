@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { featuredProjects, stats } from '@/lib/data';
+import { stats } from '@/lib/data';
+import { getProjects } from '@/sanity/lib/queries';
 
 export const metadata: Metadata = {
   title: 'Portfolio',
@@ -9,7 +10,8 @@ export const metadata: Metadata = {
     'Browse Zollani Tech Limited case studies, completed projects, and client success stories across Kenya.',
 };
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const projects = await getProjects();
   return (
     <>
       {/* Hero */}
@@ -46,7 +48,7 @@ export default function PortfolioPage() {
       <section className="bg-gray-50 py-20">
         <div className="container-wide">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project) => (
+            {projects.map((project: { slug: string; title: string; category: string; client: string; description: string; outcome: string; tags: string[] }) => (
               <div key={project.slug} className="card flex flex-col gap-4">
                 <div className="flex h-48 items-center justify-center rounded-xl bg-gradient-to-br from-coral-50 to-teal-50">
                   <span className="text-5xl opacity-30">🖥️</span>

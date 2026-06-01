@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Clock } from 'lucide-react';
-import { blogPosts } from '@/lib/data';
+import { Clock } from 'lucide-react';
+import NewsletterForm from '@/components/blog/NewsletterForm';
+import { getPosts } from '@/sanity/lib/queries';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 const categories = ['All', 'Cybersecurity', 'Networking', 'Maintenance', 'Business Tech', 'Company Updates'];
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getPosts();
   return (
     <>
       {/* Hero */}
@@ -54,7 +56,7 @@ export default function BlogPage() {
       <section className="bg-gray-50 py-16">
         <div className="container-wide">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {blogPosts.map((post) => (
+            {posts.map((post: { slug: string; category: string; title: string; excerpt: string; date: string; readTime: string }) => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
@@ -99,16 +101,9 @@ export default function BlogPage() {
             <p className="mx-auto mt-2 max-w-md text-gray-400">
               Get technology insights and cybersecurity tips delivered to your inbox.
             </p>
-            <form className="mx-auto mt-6 flex max-w-sm gap-3">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-coral/50 focus:ring-1 focus:ring-coral/50"
-              />
-              <button type="submit" className="btn-primary shrink-0 py-3">
-                Subscribe
-              </button>
-            </form>
+            <div className="mt-6">
+              <NewsletterForm />
+            </div>
           </div>
         </div>
       </section>

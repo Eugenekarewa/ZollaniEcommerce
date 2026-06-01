@@ -1,6 +1,7 @@
-import { testimonials } from '@/lib/data';
+import { getTestimonials } from '@/sanity/lib/queries';
 
-export default function Testimonials() {
+export default async function Testimonials() {
+  const testimonials: { name: string; role: string; company: string; quote: string; rating: number; initials: string }[] = await getTestimonials();
   return (
     <section className="bg-gray-50 py-20">
       <div className="container-wide">
