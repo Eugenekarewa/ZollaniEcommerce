@@ -1,0 +1,44 @@
+const PAYSTACK_BASE = 'https://api.paystack.co';
+
+function headers() {
+  return {
+    Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+    'Content-Type': 'application/json',
+  };
+}
+
+export async function initializeTransaction(params: {
+  email: string;
+  amount: number; // KES (will be multiplied by 100)
+  reference: string;
+  callbackUrl: string;
+}) {
+  const res = await fetch(`${PAYSTACK_BASE}/transaction/initialize`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({
+      email: params.email,
+      amount: params.amount * 100,
+      currency: 'KES',
+      reference: params.reference,
+      callback_url: params.callbackUrl,
+    }),
+  });
+  const data = await res.json();
+  if (!data.status) throw new Error(data.message ?? 'Paystack initialization failed');
+  return data.data as { authorization_url: string; reference: string };
+}
+
+export async function verifyTransaction(reference: string) {
+  const res = await fetch(`${PAYSTACK_BASE}/transaction/verify/${reference}`, {
+    headers: headers(),
+  });
+  const data = await res.json();
+  if (!data.status) throw new Error(data.message ?? 'Paystack verification failed');
+  return data.data as {
+    status: string;
+    amount: number;
+    reference: string;
+    customer: { email: string };
+  };
+}

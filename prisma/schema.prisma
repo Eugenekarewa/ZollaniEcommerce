@@ -8,14 +8,16 @@ datasource db {
 }
 
 model ContactSubmission {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   email     String
   phone     String?
   company   String?
   service   String
   message   String
-  createdAt DateTime @default(now())
+  status    String    @default("new") // new, quoted, closed
+  createdAt DateTime  @default(now())
+  invoices  Invoice[]
 
   @@map("contact_submissions")
 }
@@ -26,4 +28,24 @@ model NewsletterSubscriber {
   createdAt DateTime @default(now())
 
   @@map("newsletter_subscribers")
+}
+
+model Invoice {
+  id                  String             @id @default(cuid())
+  invoiceNumber       String             @unique
+  contactSubmissionId String?
+  contactSubmission   ContactSubmission? @relation(fields: [contactSubmissionId], references: [id])
+  clientName          String
+  clientEmail         String
+  clientPhone         String?
+  service             String
+  description         String
+  amount              Int // KES
+  status              String             @default("draft") // draft, sent, paid, cancelled
+  paystackRef         String?
+  paidAt              DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@map("invoices")
 }

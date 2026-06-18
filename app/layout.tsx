@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import './globals.css';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import ChatWidget from '@/components/chat/ChatWidget';
 
 export const metadata: Metadata = {
   title: {
@@ -42,12 +39,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="flex min-h-screen flex-col bg-white text-charcoal">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <ChatWidget />
-      </body>
+      <body className="flex min-h-screen flex-col bg-white text-charcoal">{children}</body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { siteConfig } from './data';
+import { formatPrice } from './invoice';
 
 // Lazy — only instantiated when actually sending an email at request time
 function getResend() {
@@ -86,6 +87,76 @@ export function contactConfirmationEmail(data: { name: string; email: string; se
           Zollani Tech · Thika Road, Muthaiga Business Centre · Nairobi, Kenya<br>
           <a href="https://zollani.co.ke" style="color:#F6917C;">zollani.co.ke</a>
         </p>
+      </div>
+    `,
+  };
+}
+
+// ── Invoice: sent to client with a Pay Now link ──────────────────────────────
+
+export function invoiceEmail(data: {
+  invoiceNumber: string;
+  clientName: string;
+  clientEmail: string;
+  service: string;
+  description: string;
+  amount: number;
+  payUrl: string;
+}) {
+  return {
+    from:    FROM_ADDRESS,
+    to:      [data.clientEmail],
+    replyTo: REPLY_TO,
+    subject: `Invoice ${data.invoiceNumber} — Zollani Tech`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+        <div style="background:linear-gradient(135deg,#F6917C,#4D9190);padding:32px;border-radius:12px 12px 0 0;text-align:center;">
+          <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Zollani Tech</h1>
+          <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px;">Invoice ${data.invoiceNumber}</p>
+        </div>
+        <div style="border:1px solid #E5E7EB;border-top:none;padding:32px;border-radius:0 0 12px 12px;">
+          <h2 style="color:#1F2937;margin:0 0 12px;">Hi ${data.clientName},</h2>
+          <p style="color:#374151;line-height:1.7;margin:0 0 20px;">
+            Following our diagnosis, here is your quote for <strong>${data.service}</strong>.
+          </p>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+            <tr><td style="padding:10px 0;border-bottom:1px solid #E5E7EB;color:#374151;">${data.description}</td>
+                <td style="padding:10px 0;border-bottom:1px solid #E5E7EB;text-align:right;font-weight:600;color:#1F2937;">${formatPrice(data.amount)}</td></tr>
+            <tr><td style="padding:14px 0;font-weight:700;color:#1F2937;">Total Due</td>
+                <td style="padding:14px 0;text-align:right;font-weight:700;color:#F6917C;font-size:18px;">${formatPrice(data.amount)}</td></tr>
+          </table>
+          <div style="text-align:center;">
+            <a href="${data.payUrl}" style="background:#F6917C;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">Pay Now — M-Pesa / Card</a>
+          </div>
+          <p style="color:#9CA3AF;font-size:13px;text-align:center;margin-top:16px;">
+            Or reach us on <a href="https://wa.me/${siteConfig.whatsapp.replace(/\D/g,'')}" style="color:#4D9190;">WhatsApp</a> to pay in person.
+          </p>
+        </div>
+        <p style="text-align:center;color:#9CA3AF;font-size:12px;margin-top:16px;">Zollani Tech · Muthaiga Business Centre, Thika Road, Nairobi</p>
+      </div>
+    `,
+  };
+}
+
+export function invoicePaidEmail(data: { invoiceNumber: string; clientName: string; clientEmail: string; amount: number }) {
+  return {
+    from:    FROM_ADDRESS,
+    to:      [data.clientEmail],
+    replyTo: REPLY_TO,
+    subject: `Payment Received — Invoice ${data.invoiceNumber}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+        <div style="background:linear-gradient(135deg,#F6917C,#4D9190);padding:32px;border-radius:12px 12px 0 0;text-align:center;">
+          <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Zollani Tech</h1>
+        </div>
+        <div style="border:1px solid #E5E7EB;border-top:none;padding:32px;border-radius:0 0 12px 12px;text-align:center;">
+          <h2 style="color:#1F2937;margin:0 0 12px;">Payment Confirmed ✓</h2>
+          <p style="color:#374151;line-height:1.7;">
+            Thanks, ${data.clientName}! We've received your payment of <strong>${formatPrice(data.amount)}</strong>
+            for invoice ${data.invoiceNumber}.
+          </p>
+        </div>
+        <p style="text-align:center;color:#9CA3AF;font-size:12px;margin-top:16px;">Zollani Tech · Thika Road, Muthaiga Business Centre · Nairobi</p>
       </div>
     `,
   };
