@@ -24,8 +24,8 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-charcoal">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-brand text-sm font-black text-white">
+          <Link href="/" className="group flex items-center gap-2 font-bold text-charcoal">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-brand text-sm font-black text-white shadow-glow-coral transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
               Z
             </div>
             <span className="hidden text-sm font-semibold sm:block">
@@ -35,10 +35,10 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-1 lg:flex">
-            <Link href="/" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+            <Link href="/" className="hover-underline rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
               Home
             </Link>
-            <Link href="/about" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+            <Link href="/about" className="hover-underline rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
               About
             </Link>
 
@@ -48,16 +48,16 @@ export default function Navbar() {
               onMouseEnter={() => setServicesOpen(true)}
               onMouseLeave={() => setServicesOpen(false)}
             >
-              <button className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+              <button className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
                 Services
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {servicesOpen && (
-                <div className="absolute left-0 top-full mt-1 w-72 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl">
+                <div className="absolute left-0 top-full mt-1 w-72 animate-fade-up rounded-2xl border border-gray-100 bg-white/95 p-2 shadow-glow-soft backdrop-blur-xl">
                   <Link
                     href="/services"
-                    className="mb-2 flex items-center justify-between rounded-xl bg-gradient-to-r from-coral-50 to-teal-50 px-3 py-2.5 text-sm font-semibold text-charcoal"
+                    className="mb-2 flex items-center justify-between rounded-xl bg-gradient-to-r from-coral-50 to-teal-50 px-3 py-2.5 text-sm font-semibold text-charcoal transition-transform hover:scale-[1.02]"
                   >
                     View All Services
                     <span className="text-xs text-gray-400">{services.length} services →</span>
@@ -67,7 +67,7 @@ export default function Navbar() {
                       <Link
                         key={s.slug}
                         href={`/services/${s.slug}`}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-coral-50 hover:text-charcoal"
                       >
                         <span className="shrink-0">{s.icon}</span>
                         {s.title}
@@ -78,16 +78,16 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link href="/portfolio" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+            <Link href="/portfolio" className="hover-underline rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
               Portfolio
             </Link>
-            <Link href="/foundation" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+            <Link href="/foundation" className="hover-underline rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
               Foundation
             </Link>
-            <Link href="/blog" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+            <Link href="/blog" className="hover-underline rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
               Blog
             </Link>
-            <Link href="/contact" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-charcoal">
+            <Link href="/contact" className="hover-underline rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-charcoal">
               Contact
             </Link>
           </nav>

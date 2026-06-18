@@ -62,8 +62,8 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-teal-100 bg-teal-50 px-8 py-16 text-center">
-        <CheckCircle2 className="h-14 w-14 text-teal" />
+      <div className="animate-fade-up flex flex-col items-center justify-center rounded-2xl border border-teal-100 bg-teal-50 px-8 py-16 text-center shadow-glow-teal">
+        <CheckCircle2 className="h-14 w-14 text-teal drop-shadow-[0_0_12px_rgba(77,145,144,0.5)]" />
         <h3 className="mt-4 text-xl font-bold text-charcoal">Message Sent!</h3>
         <p className="mt-2 max-w-sm text-gray-500">
           We've received your enquiry and will get back to you within 24 hours.
@@ -108,7 +108,7 @@ export default function ContactForm() {
             value={form.name}
             onChange={handleChange}
             placeholder="Jane Mwangi"
-            className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+            className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-all duration-300 focus:border-coral focus:ring-2 focus:ring-coral-200 focus:shadow-glow-coral"
           />
           {fieldError('name')}
         </div>
@@ -124,7 +124,7 @@ export default function ContactForm() {
             value={form.email}
             onChange={handleChange}
             placeholder="jane@company.co.ke"
-            className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+            className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-all duration-300 focus:border-coral focus:ring-2 focus:ring-coral-200 focus:shadow-glow-coral"
           />
           {fieldError('email')}
         </div>
@@ -141,7 +141,7 @@ export default function ContactForm() {
           value={form.phone}
           onChange={handleChange}
           placeholder="+254 700 000 000"
-          className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+          className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-all duration-300 focus:border-coral focus:ring-2 focus:ring-coral-200 focus:shadow-glow-coral"
         />
       </div>
 
@@ -156,7 +156,7 @@ export default function ContactForm() {
           value={form.company}
           onChange={handleChange}
           placeholder="Your company or school"
-          className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+          className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-all duration-300 focus:border-coral focus:ring-2 focus:ring-coral-200 focus:shadow-glow-coral"
         />
       </div>
 
@@ -170,7 +170,7 @@ export default function ContactForm() {
           required
           value={form.service}
           onChange={handleChange}
-          className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+          className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal outline-none transition-all duration-300 focus:border-coral focus:ring-2 focus:ring-coral-200 focus:shadow-glow-coral"
         >
           <option value="">Select a service…</option>
           {serviceOptions.map((s) => (
@@ -193,7 +193,7 @@ export default function ContactForm() {
           value={form.message}
           onChange={handleChange}
           placeholder="Describe your technology needs or the issue you're experiencing…"
-          className="mt-1.5 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-colors focus:border-coral focus:ring-1 focus:ring-coral"
+          className="mt-1.5 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-charcoal placeholder-gray-400 outline-none transition-all duration-300 focus:border-coral focus:ring-2 focus:ring-coral-200 focus:shadow-glow-coral"
         />
         {fieldError('message')}
       </div>

@@ -4,14 +4,17 @@ import { siteConfig, services } from '@/lib/data';
 
 export default function Footer() {
   return (
-    <footer className="bg-charcoal text-gray-300">
-      <div className="container-wide py-16">
+    <footer className="relative overflow-hidden bg-charcoal text-gray-300">
+      <div className="glow-orb -left-32 -top-32 h-72 w-72 bg-coral/20" />
+      <div className="glow-orb -bottom-32 -right-32 h-72 w-72 bg-teal/20" />
+
+      <div className="container-wide relative py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
 
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/" className="mb-4 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-base font-black text-white">
+            <Link href="/" className="group mb-4 flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-base font-black text-white shadow-glow-coral transition-transform duration-300 group-hover:scale-110">
                 Z
               </div>
               <span className="font-bold text-white">
@@ -34,7 +37,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-gray-400 transition-colors hover:bg-coral hover:text-white"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-gray-400 transition-all duration-300 hover:-translate-y-0.5 hover:bg-coral hover:text-white hover:shadow-glow-coral"
                 >
                   {icon}
                 </a>

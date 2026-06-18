@@ -46,6 +46,45 @@ const config: Config = {
       },
       backgroundImage: {
         'gradient-brand': 'linear-gradient(135deg, #F6917C, #4D9190)',
+        'gradient-brand-radial': 'radial-gradient(circle at top left, #F6917C, #4D9190 70%)',
+        'gradient-mesh': `
+          radial-gradient(at 0% 0%, rgba(246,145,124,0.35) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(77,145,144,0.35) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(246,145,124,0.25) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, rgba(77,145,144,0.25) 0px, transparent 50%)
+        `,
+      },
+      boxShadow: {
+        'glow-coral': '0 0 40px -8px rgba(246,145,124,0.55)',
+        'glow-teal': '0 0 40px -8px rgba(77,145,144,0.55)',
+        'glow-soft': '0 8px 40px -12px rgba(31,41,55,0.25)',
+      },
+      keyframes: {
+        'fade-up': {
+          '0%':   { opacity: '0', transform: 'translateY(24px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%':      { transform: 'translateY(-12px)' },
+        },
+        'gradient-pan': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%':      { backgroundPosition: '100% 50%' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '0.6' },
+          '50%':      { opacity: '1' },
+        },
+      },
+      animation: {
+        'fade-up': 'fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both',
+        float: 'float 6s ease-in-out infinite',
+        'gradient-pan': 'gradient-pan 8s ease infinite',
+        'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+      },
+      backgroundSize: {
+        '200%': '200% 200%',
       },
     },
   },

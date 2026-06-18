@@ -27,27 +27,31 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-coral px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-coral-500 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400;
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-coral px-6 py-3 text-sm font-semibold text-white shadow-glow-coral transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_55px_-6px_rgba(246,145,124,0.75)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-teal px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-teal-500 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400;
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-teal px-6 py-3 text-sm font-semibold text-white shadow-glow-teal transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_55px_-6px_rgba(77,145,144,0.75)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:scale-[1.03] hover:border-white/60 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-charcoal transition-all hover:border-gray-300 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-charcoal transition-all duration-300 hover:-translate-y-0.5 hover:border-coral-200 hover:shadow-glow-soft active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400;
   }
 
   .section-badge {
-    @apply inline-flex items-center rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-coral-500;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-coral-200 bg-coral-50 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-coral-500 shadow-[0_0_0_1px_rgba(246,145,124,0.08)];
   }
 
   .card {
-    @apply rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5;
+    @apply rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-coral-100 hover:shadow-glow-soft;
+  }
+
+  .card-glass {
+    @apply rounded-2xl border border-white/15 bg-white/10 p-6 shadow-glow-soft backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/15;
   }
 
   .container-wide {
@@ -55,7 +59,7 @@
   }
 
   .section-title {
-    @apply text-3xl font-bold tracking-tight text-charcoal sm:text-4xl;
+    @apply text-3xl font-extrabold tracking-tight text-charcoal sm:text-4xl lg:text-5xl;
   }
 
   .section-subtitle {
@@ -68,8 +72,46 @@
     @apply bg-gradient-brand bg-clip-text text-transparent;
   }
 
+  .text-gradient-animated {
+    @apply bg-gradient-brand bg-200% bg-clip-text text-transparent animate-gradient-pan;
+  }
+
   .bg-dot-pattern {
     background-image: radial-gradient(circle, rgba(79,145,144,0.15) 1px, transparent 1px);
     background-size: 24px 24px;
+  }
+
+  .bg-mesh {
+    @apply bg-gradient-mesh;
+  }
+
+  .glow-orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+  }
+
+  /* Scroll-reveal: paired with the Reveal client component, which toggles
+     data-revealed once the element enters the viewport. */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-reveal][data-revealed='true'] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hover-underline {
+    @apply relative;
+  }
+
+  .hover-underline::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 h-0.5 w-0 bg-gradient-brand transition-all duration-300;
+  }
+
+  .hover-underline:hover::after {
+    @apply w-full;
   }
 }
