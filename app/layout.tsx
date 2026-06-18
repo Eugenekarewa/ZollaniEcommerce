@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import ChatWidget from '@/components/chat/ChatWidget';
 
 export const metadata: Metadata = {
   title: {
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <ChatWidget />
       </body>
     </html>
   );
