@@ -162,6 +162,88 @@ export function invoicePaidEmail(data: { invoiceNumber: string; clientName: stri
   };
 }
 
+// ── Invoice: automatic payment reminders ─────────────────────────────────────
+
+const REMINDER_COPY: Record<number, { subject: string; heading: string; tone: string; color: string }> = {
+  1: {
+    subject: `Payment due soon — Invoice {{number}}`,
+    heading: 'Your payment is due soon',
+    tone: 'Just a friendly reminder that your invoice is due soon. You can settle it online in a couple of taps.',
+    color: '#4D9190',
+  },
+  2: {
+    subject: `Payment overdue — Invoice {{number}}`,
+    heading: 'Your payment is now overdue',
+    tone: 'Your invoice payment is now overdue. Please settle it at your earliest convenience to avoid any delay on your service.',
+    color: '#F6917C',
+  },
+  3: {
+    subject: `Final notice — Invoice {{number}} significantly overdue`,
+    heading: 'Final payment reminder',
+    tone: 'This is a final reminder that your invoice remains unpaid. Please reach out if you are facing any issues paying, or settle it online below.',
+    color: '#DC4D31',
+  },
+};
+
+export function paymentReminderEmail(data: {
+  stage: 1 | 2 | 3;
+  invoiceNumber: string;
+  clientName: string;
+  clientEmail: string;
+  service: string;
+  amount: number;
+  dueDate: Date;
+  payUrl: string;
+}) {
+  const copy = REMINDER_COPY[data.stage];
+  return {
+    from:    FROM_ADDRESS,
+    to:      [data.clientEmail],
+    replyTo: REPLY_TO,
+    subject: copy.subject.replace('{{number}}', data.invoiceNumber),
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+        <div style="background:${copy.color};padding:32px;border-radius:12px 12px 0 0;text-align:center;">
+          <h1 style="color:#fff;margin:0;font-size:22px;font-weight:900;">Zollani Tech</h1>
+          <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px;">${copy.heading}</p>
+        </div>
+        <div style="border:1px solid #E5E7EB;border-top:none;padding:32px;border-radius:0 0 12px 12px;">
+          <h2 style="color:#1F2937;margin:0 0 12px;">Hi ${data.clientName},</h2>
+          <p style="color:#374151;line-height:1.7;margin:0 0 20px;">${copy.tone}</p>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+            <tr><td style="padding:8px 0;color:#374151;">Invoice</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#1F2937;">${data.invoiceNumber}</td></tr>
+            <tr><td style="padding:8px 0;color:#374151;">Service</td><td style="padding:8px 0;text-align:right;color:#1F2937;">${data.service}</td></tr>
+            <tr><td style="padding:8px 0;color:#374151;">Due date</td><td style="padding:8px 0;text-align:right;color:#1F2937;">${data.dueDate.toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
+            <tr><td style="padding:14px 0;font-weight:700;color:#1F2937;">Amount Due</td><td style="padding:14px 0;text-align:right;font-weight:700;color:${copy.color};font-size:18px;">${formatPrice(data.amount)}</td></tr>
+          </table>
+          <div style="text-align:center;">
+            <a href="${data.payUrl}" style="background:${copy.color};color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">Pay Now — M-Pesa / Card</a>
+          </div>
+          <p style="color:#9CA3AF;font-size:13px;text-align:center;margin-top:16px;">
+            Or reach us on <a href="https://wa.me/${siteConfig.whatsapp.replace(/\D/g,'')}" style="color:#4D9190;">WhatsApp</a> if you have any questions.
+          </p>
+        </div>
+        <p style="text-align:center;color:#9CA3AF;font-size:12px;margin-top:16px;">Zollani Tech · Muthaiga Business Centre, Thika Road, Nairobi</p>
+      </div>
+    `,
+  };
+}
+
+export function paymentReminderWhatsAppMessage(data: {
+  stage: 1 | 2 | 3;
+  invoiceNumber: string;
+  clientName: string;
+  amount: number;
+  payUrl: string;
+}) {
+  const lines: Record<number, string> = {
+    1: `Hi ${data.clientName}, this is a reminder from Zollani Tech that invoice ${data.invoiceNumber} (${formatPrice(data.amount)}) is due soon. Pay here: ${data.payUrl}`,
+    2: `Hi ${data.clientName}, your Zollani Tech invoice ${data.invoiceNumber} (${formatPrice(data.amount)}) is now overdue. Please settle it here: ${data.payUrl}`,
+    3: `Hi ${data.clientName}, final reminder: invoice ${data.invoiceNumber} (${formatPrice(data.amount)}) from Zollani Tech remains unpaid. Pay here: ${data.payUrl} — or reply if you're having trouble.`,
+  };
+  return lines[data.stage];
+}
+
 // ── Newsletter: welcome email ────────────────────────────────────────────────
 
 export function newsletterWelcomeEmail(email: string) {

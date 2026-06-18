@@ -3,6 +3,7 @@ import { contactSchema } from '@/lib/validations';
 
 export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
+import { findOrCreateCustomer } from '@/lib/customer';
 import {
   resend,
   contactNotificationEmail,
@@ -24,15 +25,23 @@ export async function POST(req: NextRequest) {
 
     const data = result.data;
 
-    // Store in database
+    // Link to (or create) a customer record, then store the submission
+    const customer = await findOrCreateCustomer({
+      name:    data.name,
+      email:   data.email,
+      phone:   data.phone,
+      company: data.company,
+    });
+
     await db.contactSubmission.create({
       data: {
-        name:    data.name,
-        email:   data.email,
-        phone:   data.phone,
-        company: data.company,
-        service: data.service,
-        message: data.message,
+        name:       data.name,
+        email:      data.email,
+        phone:      data.phone,
+        company:    data.company,
+        service:    data.service,
+        message:    data.message,
+        customerId: customer.id,
       },
     });
 

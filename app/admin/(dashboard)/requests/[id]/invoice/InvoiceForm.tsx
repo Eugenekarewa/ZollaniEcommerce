@@ -23,11 +23,12 @@ export default function InvoiceForm({ request }: { request: Request }) {
     service:     request.service,
     description: '',
     amount:      0,
+    dueInDays:   7,
   });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: name === 'amount' ? Number(value) : value }));
+    setForm((p) => ({ ...p, [name]: name === 'amount' || name === 'dueInDays' ? Number(value) : value }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -84,9 +85,15 @@ export default function InvoiceForm({ request }: { request: Request }) {
           className="w-full resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-charcoal mb-1.5">Amount (KES)</label>
-        <input name="amount" type="number" required min={1} value={form.amount || ''} onChange={handleChange} className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200" />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-charcoal mb-1.5">Amount (KES)</label>
+          <input name="amount" type="number" required min={1} value={form.amount || ''} onChange={handleChange} className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-charcoal mb-1.5">Due in (days)</label>
+          <input name="dueInDays" type="number" required min={0} max={90} value={form.dueInDays} onChange={handleChange} className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200" />
+        </div>
       </div>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}

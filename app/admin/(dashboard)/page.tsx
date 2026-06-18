@@ -1,23 +1,23 @@
 import Link from 'next/link';
-import { Inbox, Receipt, DollarSign, Clock } from 'lucide-react';
+import { Inbox, Receipt, DollarSign, Clock, Users, AlertTriangle } from 'lucide-react';
 import { db } from '@/lib/db';
 import { formatPrice } from '@/lib/invoice';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
-  const [requestCount, invoiceCount, newRequests, recentInvoices, revenue] = await Promise.all([
-    db.contactSubmission.count(),
-    db.invoice.count(),
+  const [customerCount, newRequests, overdueCount, recentInvoices, revenue] = await Promise.all([
+    db.customer.count(),
     db.contactSubmission.count({ where: { status: 'new' } }),
+    db.invoice.count({ where: { status: 'sent', dueDate: { lt: new Date() } } }),
     db.invoice.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
     db.invoice.aggregate({ _sum: { amount: true }, where: { status: 'paid' } }),
   ]);
 
   const stats = [
-    { icon: <Inbox className="h-6 w-6 text-coral" />, label: 'Service Requests', value: requestCount, href: '/admin/requests' },
-    { icon: <Clock className="h-6 w-6 text-coral" />, label: 'New (Unhandled)', value: newRequests, href: '/admin/requests' },
-    { icon: <Receipt className="h-6 w-6 text-teal" />, label: 'Invoices', value: invoiceCount, href: '/admin/invoices' },
+    { icon: <Users className="h-6 w-6 text-coral" />, label: 'Customers', value: customerCount, href: '/admin/customers' },
+    { icon: <Inbox className="h-6 w-6 text-coral" />, label: 'New Requests', value: newRequests, href: '/admin/requests' },
+    { icon: <AlertTriangle className="h-6 w-6 text-coral" />, label: 'Overdue Invoices', value: overdueCount, href: '/admin/invoices' },
     { icon: <DollarSign className="h-6 w-6 text-teal" />, label: 'Revenue Collected', value: formatPrice(revenue._sum.amount ?? 0), href: '/admin/invoices' },
   ];
 

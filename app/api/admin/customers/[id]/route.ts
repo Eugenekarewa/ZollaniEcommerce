@@ -7,10 +7,10 @@ export const dynamic = 'force-dynamic';
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
-    const { status } = await req.json();
-    const submission = await db.contactSubmission.update({ where: { id }, data: { status } });
-    return NextResponse.json(submission);
+    const { notes, tags } = await req.json();
+    const customer = await db.customer.update({ where: { id }, data: { notes, tags } });
+    return NextResponse.json(customer);
   } catch (err) {
-    return NextResponse.json({ error: friendlyError(err, 'admin/requests/PUT') }, { status: 400 });
+    return NextResponse.json({ error: friendlyError(err, 'admin/customers/PUT') }, { status: 400 });
   }
 }

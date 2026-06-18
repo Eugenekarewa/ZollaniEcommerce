@@ -7,17 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Customer {
+  id            String              @id @default(cuid())
+  name          String
+  email         String              @unique
+  phone         String?
+  company       String?
+  address       String?
+  notes         String?
+  tags          String[]            @default([])
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  submissions   ContactSubmission[]
+  invoices      Invoice[]
+
+  @@map("customers")
+}
+
 model ContactSubmission {
-  id        String    @id @default(cuid())
-  name      String
-  email     String
-  phone     String?
-  company   String?
-  service   String
-  message   String
-  status    String    @default("new") // new, quoted, closed
-  createdAt DateTime  @default(now())
-  invoices  Invoice[]
+  id         String    @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  company    String?
+  service    String
+  message    String
+  status     String    @default("new") // new, quoted, closed
+  createdAt  DateTime  @default(now())
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  invoices   Invoice[]
 
   @@map("contact_submissions")
 }
@@ -35,6 +54,8 @@ model Invoice {
   invoiceNumber       String             @unique
   contactSubmissionId String?
   contactSubmission   ContactSubmission? @relation(fields: [contactSubmissionId], references: [id])
+  customerId          String?
+  customer            Customer?          @relation(fields: [customerId], references: [id])
   clientName          String
   clientEmail         String
   clientPhone         String?
@@ -42,6 +63,9 @@ model Invoice {
   description         String
   amount              Int // KES
   status              String             @default("draft") // draft, sent, paid, cancelled
+  dueDate             DateTime?
+  reminderStage       Int                @default(0) // 0=none, 1=due-soon sent, 2=overdue sent, 3=final notice sent
+  lastReminderAt      DateTime?
   paystackRef         String?
   paidAt              DateTime?
   createdAt           DateTime           @default(now())

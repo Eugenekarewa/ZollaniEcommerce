@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutDashboard, Inbox, Receipt, LogOut } from 'lucide-react';
+import { LayoutDashboard, Inbox, Receipt, Users, LogOut } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +12,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex-1 p-4 space-y-1 text-sm">
           <Link href="/admin" className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">
             <LayoutDashboard className="h-4 w-4" /> Dashboard
+          </Link>
+          <Link href="/admin/customers" className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">
+            <Users className="h-4 w-4" /> Customers
           </Link>
           <Link href="/admin/requests" className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">
             <Inbox className="h-4 w-4" /> Service Requests

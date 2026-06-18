@@ -7,7 +7,10 @@ export const dynamic = 'force-dynamic';
 export default async function AdminRequestsPage() {
   const requests = await db.contactSubmission.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { invoices: { select: { id: true, invoiceNumber: true, status: true } } },
+    include: {
+      invoices: { select: { id: true, invoiceNumber: true, status: true } },
+      customer: { select: { id: true } },
+    },
   });
 
   return (
@@ -22,7 +25,13 @@ export default async function AdminRequestsPage() {
             <div key={req.id} className="card space-y-3">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="font-bold text-charcoal">{req.name}</p>
+                  {req.customer ? (
+                    <Link href={`/admin/customers/${req.customer.id}`} className="font-bold text-charcoal hover:text-coral hover:underline">
+                      {req.name}
+                    </Link>
+                  ) : (
+                    <p className="font-bold text-charcoal">{req.name}</p>
+                  )}
                   <p className="text-sm text-gray-500">{req.email} {req.phone ? `· ${req.phone}` : ''}</p>
                   <p className="text-sm text-coral font-medium mt-1">{req.service}</p>
                 </div>
