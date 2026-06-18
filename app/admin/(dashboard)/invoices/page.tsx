@@ -31,7 +31,8 @@ export default async function AdminInvoicesPage() {
                 <th className="px-4 py-3">Client</th>
                 <th className="px-4 py-3">Service</th>
                 <th className="px-4 py-3">Amount</th>
-                <th className="px-4 py-3">Due Date</th>
+                <th className="px-4 py-3">Due / Paid</th>
+                <th className="px-4 py-3">Method</th>
                 <th className="px-4 py-3">Reminders</th>
                 <th className="px-4 py-3">Status</th>
               </tr>
@@ -53,12 +54,15 @@ export default async function AdminInvoicesPage() {
                     <td className="px-4 py-3 text-gray-500">{inv.service}</td>
                     <td className="px-4 py-3 font-medium text-coral">{formatPrice(inv.amount)}</td>
                     <td className="px-4 py-3 text-xs">
-                      {inv.dueDate ? (
+                      {inv.status === 'paid' && inv.paidAt ? (
+                        <span className="text-green-700">Paid {inv.paidAt.toLocaleDateString('en-KE')}</span>
+                      ) : inv.dueDate ? (
                         <span className={isOverdue ? 'text-red-600 font-semibold' : 'text-gray-500'}>
                           {inv.dueDate.toLocaleDateString('en-KE')}{isOverdue ? ' (overdue)' : ''}
                         </span>
                       ) : '—'}
                     </td>
+                    <td className="px-4 py-3 text-xs text-gray-500 capitalize">{inv.paymentMethod ?? '—'}</td>
                     <td className="px-4 py-3 text-xs text-gray-500">{REMINDER_LABELS[inv.reminderStage]}</td>
                     <td className="px-4 py-3">
                       <InvoiceStatusSelect invoiceId={inv.id} current={inv.status} />

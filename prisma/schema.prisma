@@ -63,6 +63,7 @@ model Invoice {
   description         String
   amount              Int // KES
   status              String             @default("draft") // draft, sent, paid, cancelled
+  paymentMethod       String?            // paystack, cash, mpesa, bank, other
   dueDate             DateTime?
   reminderStage       Int                @default(0) // 0=none, 1=due-soon sent, 2=overdue sent, 3=final notice sent
   lastReminderAt      DateTime?
@@ -72,4 +73,47 @@ model Invoice {
   updatedAt           DateTime           @updatedAt
 
   @@map("invoices")
+}
+
+model InventoryItem {
+  id           String              @id @default(cuid())
+  name         String
+  sku          String?             @unique
+  category     String              // Screens, RAM, Batteries, Cables, Storage, Chargers, Other
+  quantity     Int                 @default(0)
+  reorderLevel Int                 @default(5)
+  unitCost     Int?                // KES — what we pay to acquire it
+  unitPrice    Int?                // KES — what we charge a client if used in a repair
+  supplier     String?
+  notes        String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  movements    InventoryMovement[]
+
+  @@map("inventory_items")
+}
+
+model InventoryMovement {
+  id        String        @id @default(cuid())
+  itemId    String
+  item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  type      String        // restock, used, adjustment
+  quantity  Int           // signed delta — positive for restock, negative for used
+  note      String?
+  createdAt DateTime      @default(now())
+
+  @@map("inventory_movements")
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  category    String   // Rent, Utilities, Supplies, Salaries, Marketing, Transport, Other
+  description String
+  amount      Int      // KES
+  date        DateTime @default(now())
+  vendor      String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@map("expenses")
 }
