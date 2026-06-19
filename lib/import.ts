@@ -210,16 +210,25 @@ function parseSheet(sheet: XLSX.WorkSheet, sheetName: string): {
     // The importer still records the transaction; lib/customer.ts derives a
     // stable placeholder identity from the name in that case.
 
+    const expenseRaw = findValue(r, EXPENSE_CANDIDATES);
+    const profitRaw = findValue(r, PROFIT_CANDIDATES);
+    const profit = parseCleanNumber(profitRaw);
+
     let amount = parseCleanNumber(findValue(r, AMOUNT_CANDIDATES));
     if (amount === null) {
       // Amount cell is a formula/expression (e.g. "(3*2500)+3500") — derive from profit + expense instead
-      const profit = parseCleanNumber(findValue(r, PROFIT_CANDIDATES));
-      const expenseForFallback = parseCleanNumber(findValue(r, EXPENSE_CANDIDATES)) ?? 0;
+      const expenseForFallback = parseCleanNumber(expenseRaw) ?? 0;
       if (profit !== null) amount = profit + expenseForFallback;
     }
     if (!amount || amount <= 0) { errors.push({ sheet: sheetName, row: rowNum, reason: 'Missing or invalid amount' }); return; }
 
-    const expense = parseCleanNumber(findValue(r, EXPENSE_CANDIDATES)) ?? 0;
+    // Some sheets only log "Profit" with no separate "Expense" column (e.g. amount
+    // charged 6400, profit 1500). That gap is real spend (parts/materials) that
+    // would otherwise vanish from the books — derive it so expenses stay accurate.
+    let expense = parseCleanNumber(expenseRaw) ?? 0;
+    if (expenseRaw === undefined && profitRaw !== undefined && profit !== null) {
+      expense = Math.max(0, amount - profit);
+    }
     const { status, amountPaid } = parsePaymentInfo(findValue(r, STATUS_CANDIDATES), amount);
     const dateRaw = findValue(r, DATE_CANDIDATES);
     const date = dateRaw !== undefined ? parseDate(dateRaw) : (sheetMonthFallback ?? parseDate(undefined));
