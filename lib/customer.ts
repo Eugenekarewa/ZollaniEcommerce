@@ -1,5 +1,13 @@
 import { db } from './db';
 
+/** Customer.email is required + unique. For records that only have a phone
+ * number (e.g. an imported spreadsheet row), derive a stable placeholder so
+ * the same phone always maps to the same customer. */
+export function placeholderEmail(phone: string) {
+  const digits = phone.replace(/\D/g, '');
+  return `${digits}@no-email.zollani.local`;
+}
+
 export async function findOrCreateCustomer(data: {
   name: string;
   email: string;

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -12,11 +12,16 @@ export default async function AdminCustomersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-black text-charcoal">Customers ({customers.length})</h1>
-        <Link href="/admin/customers/new" className="btn-primary">
-          <Plus className="h-4 w-4" /> Add Customer
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/admin/customers/import" className="btn-ghost">
+            <Upload className="h-4 w-4" /> Import from Excel
+          </Link>
+          <Link href="/admin/customers/new" className="btn-primary">
+            <Plus className="h-4 w-4" /> Add Customer
+          </Link>
+        </div>
       </div>
 
       {customers.length === 0 ? (
