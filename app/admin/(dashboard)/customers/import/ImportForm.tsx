@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Upload, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
+import { Loader2, Upload, CheckCircle2, AlertTriangle, Calendar, Trash2 } from 'lucide-react';
 import { formatPrice } from '@/lib/invoice';
 
 type MonthBucket = {
@@ -44,6 +44,68 @@ export default function ImportForm() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<ImportResult | null>(null);
 
+  const [importedCounts, setImportedCounts] = useState<{ invoices: number; expenses: number } | null>(null);
+  const [clearing, setClearing] = useState(false);
+  const [clearError, setClearError] = useState('');
+
+  async function refreshImportedCounts() {
+    try {
+      const res = await fetch('/api/admin/customers/import/clear');
+      const data = await res.json();
+      if (res.ok) setImportedCounts(data);
+    } catch {
+      // non-critical — the clear button just won't show a count
+    }
+  }
+
+  useEffect(() => {
+    refreshImportedCounts();
+  }, []);
+
+  async function handleClearImported() {
+    if (!importedCounts) return;
+    const confirmed = window.confirm(
+      `This permanently deletes ${importedCounts.invoices} imported invoice(s) and ${importedCounts.expenses} imported expense(s). ` +
+      `Customers and any other invoices are not affected. This cannot be undone. Continue?`
+    );
+    if (!confirmed) return;
+
+    setClearing(true);
+    setClearError('');
+    try {
+      const res = await fetch('/api/admin/customers/import/clear', { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Failed to clear records');
+      await refreshImportedCounts();
+      router.refresh();
+    } catch (err) {
+      setClearError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
+      setClearing(false);
+    }
+  }
+
+  const clearSection = importedCounts && (importedCounts.invoices > 0 || importedCounts.expenses > 0) && (
+    <div className="card flex flex-wrap items-center justify-between gap-3 border-red-100 bg-red-50/50">
+      <div className="text-sm">
+        <p className="font-semibold text-charcoal">Imported records on file</p>
+        <p className="text-gray-500">
+          {importedCounts.invoices} invoice{importedCounts.invoices !== 1 ? 's' : ''} · {importedCounts.expenses} expense{importedCounts.expenses !== 1 ? 's' : ''} from spreadsheet imports.
+          {clearError && <span className="text-red-600 block mt-1">{clearError}</span>}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={handleClearImported}
+        disabled={clearing}
+        className="btn-ghost text-red-600 border-red-200 hover:bg-red-50 disabled:opacity-60"
+      >
+        {clearing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+        Clear Imported Records
+      </button>
+    </div>
+  );
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!file) return;
@@ -61,6 +123,7 @@ export default function ImportForm() {
 
       setResult(data);
       router.refresh();
+      refreshImportedCounts();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
@@ -71,6 +134,7 @@ export default function ImportForm() {
   if (result) {
     return (
       <div className="space-y-4">
+        {clearSection}
         <div className="card space-y-4">
           <div className="flex items-center gap-2 text-teal">
             <CheckCircle2 className="h-6 w-6" />
@@ -230,7 +294,9 @@ export default function ImportForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card space-y-5">
+    <div className="space-y-4">
+      {clearSection}
+      <form onSubmit={handleSubmit} className="card space-y-5">
       <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-xs text-gray-500 space-y-1">
         <p className="font-semibold text-charcoal text-sm mb-1">Expected columns (any order, header names are flexible):</p>
         <p><strong>Name</strong> · <strong>Email or Phone</strong> · <strong>Amount</strong> · <strong>Paid/Unpaid</strong> · <strong>Date</strong> · <strong>Service</strong></p>
@@ -269,6 +335,7 @@ export default function ImportForm() {
       <button type="submit" disabled={loading || !file} className="btn-primary disabled:opacity-60">
         {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Importing…</> : <><Upload className="h-4 w-4" /> Import Customers</>}
       </button>
-    </form>
+      </form>
+    </div>
   );
 }

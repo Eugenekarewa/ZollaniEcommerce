@@ -156,6 +156,11 @@ function parseSheet(sheet: XLSX.WorkSheet, sheetName: string): {
   raw.forEach((r, i) => {
     const rowNum = headerRowIndex + i + 2;
 
+    // Spreadsheets often have blank spacer rows between weeks/sections — skip
+    // these silently rather than reporting them as an error needing attention.
+    const isBlankRow = Object.values(r).every((v) => String(v ?? '').trim() === '');
+    if (isBlankRow) return;
+
     const name = String(findValue(r, NAME_CANDIDATES) ?? '').trim();
     if (!name) { errors.push({ sheet: sheetName, row: rowNum, reason: 'Missing name' }); return; }
 
@@ -169,7 +174,9 @@ function parseSheet(sheet: XLSX.WorkSheet, sheetName: string): {
     }
     if (phone) phone = normalizePhone(phone);
 
-    if (!email && !phone) { errors.push({ sheet: sheetName, row: rowNum, reason: 'Missing email/phone' }); return; }
+    // Contact info is optional — many walk-in/cash customers have none recorded.
+    // The importer still records the transaction; lib/customer.ts derives a
+    // stable placeholder identity from the name in that case.
 
     let amount = parseCleanNumber(findValue(r, AMOUNT_CANDIDATES));
     if (amount === null) {

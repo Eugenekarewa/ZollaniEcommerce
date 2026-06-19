@@ -8,6 +8,14 @@ export function placeholderEmail(phone: string) {
   return `${digits}@no-email.zollani.local`;
 }
 
+/** For records with neither email nor phone (e.g. a walk-in cash customer in
+ * an imported spreadsheet), derive a stable placeholder from the name so
+ * repeat mentions of the same name still group under one customer. */
+export function placeholderEmailForName(name: string) {
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
+  return `${slug}@no-contact.zollani.local`;
+}
+
 export async function findOrCreateCustomer(data: {
   name: string;
   email: string;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { parseSpreadsheet } from '@/lib/import';
-import { findOrCreateCustomer, placeholderEmail } from '@/lib/customer';
+import { findOrCreateCustomer, placeholderEmail, placeholderEmailForName } from '@/lib/customer';
 import { generateInvoiceNumber } from '@/lib/invoice';
 import { friendlyError } from '@/lib/api-error';
 
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     for (const row of rows) {
       try {
-        const email = row.email ?? placeholderEmail(row.phone!);
+        const email = row.email ?? (row.phone ? placeholderEmail(row.phone) : placeholderEmailForName(row.name));
         const before = await db.customer.findUnique({ where: { email } });
         const customer = await findOrCreateCustomer({ name: row.name, email, phone: row.phone });
         if (!before) customersCreated++;
