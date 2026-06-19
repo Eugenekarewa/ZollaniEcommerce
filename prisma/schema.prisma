@@ -118,3 +118,21 @@ model Expense {
 
   @@map("expenses")
 }
+
+model Asset {
+  id              String    @id @default(cuid())
+  name            String
+  category        String    // Equipment, Tools, Vehicle, Furniture, Electronics, Other
+  purchaseCost    Int       // KES
+  purchaseDate    DateTime
+  usefulLifeYears Int       @default(3) // for straight-line depreciation
+  salvageValue    Int       @default(0) // KES — estimated residual value at end of useful life
+  notes           String?
+  disposed        Boolean   @default(false)
+  disposedAt      DateTime?
+  disposalValue   Int?      // KES received when sold/written off
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("assets")
+}

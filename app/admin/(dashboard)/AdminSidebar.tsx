@@ -5,16 +5,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Inbox, Receipt, Users, Package, Wallet, BarChart3,
-  PlusCircle, LogOut, Menu, X, Settings,
+  PlusCircle, LogOut, Menu, X, Settings, Calculator, Building2,
 } from 'lucide-react';
 
 const navLinks = [
   { href: '/admin',           label: 'Dashboard',       icon: LayoutDashboard },
   { href: '/admin/analytics', label: 'Analytics',       icon: BarChart3 },
+  { href: '/admin/accounting', label: 'Accounting',     icon: Calculator },
   { href: '/admin/customers', label: 'Customers',       icon: Users },
   { href: '/admin/requests',  label: 'Service Requests', icon: Inbox },
   { href: '/admin/invoices',  label: 'Invoices',        icon: Receipt },
   { href: '/admin/inventory', label: 'Inventory',       icon: Package },
+  { href: '/admin/assets',    label: 'Business Assets', icon: Building2 },
   { href: '/admin/expenses',  label: 'Expenses',        icon: Wallet },
   { href: '/admin/settings',  label: 'Settings',        icon: Settings },
 ];
