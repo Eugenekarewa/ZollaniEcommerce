@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Inbox, Receipt, Users, Package, Wallet, BarChart3,
-  PlusCircle, LogOut, Menu, X,
+  PlusCircle, LogOut, Menu, X, Settings,
 } from 'lucide-react';
 
 const navLinks = [
@@ -16,6 +16,7 @@ const navLinks = [
   { href: '/admin/invoices',  label: 'Invoices',        icon: Receipt },
   { href: '/admin/inventory', label: 'Inventory',       icon: Package },
   { href: '/admin/expenses',  label: 'Expenses',        icon: Wallet },
+  { href: '/admin/settings',  label: 'Settings',        icon: Settings },
 ];
 
 export default function AdminSidebar() {
