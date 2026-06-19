@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Upload, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Loader2, Upload, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
 import { formatPrice } from '@/lib/invoice';
+
+type MonthBucket = { month: string; sortKey: string; paidCount: number; paidTotal: number; unpaidCount: number; unpaidTotal: number };
+type ImportRecord = { name: string; date: string; amount: number; paid: boolean; service: string };
 
 type ImportResult = {
   totalRows: number;
@@ -12,6 +15,8 @@ type ImportResult = {
   paidTotal: number;
   unpaidCount: number;
   unpaidTotal: number;
+  monthlyBreakdown: MonthBucket[];
+  records: ImportRecord[];
   errors: { row: number; reason: string }[];
 };
 
@@ -99,6 +104,78 @@ export default function ImportForm() {
             <button onClick={() => { setResult(null); setFile(null); }} className="btn-ghost">Import Another File</button>
           </div>
         </div>
+
+        {/* Monthly breakdown */}
+        {result.monthlyBreakdown.length > 0 && (
+          <div className="card space-y-3">
+            <h3 className="font-bold text-charcoal flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-coral" /> By Month
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px] text-sm">
+                <thead className="border-b border-gray-100">
+                  <tr className="text-left text-xs text-gray-400 uppercase">
+                    <th className="py-2 pr-4">Month</th>
+                    <th className="py-2 pr-4">Paid</th>
+                    <th className="py-2 pr-4">Unpaid</th>
+                    <th className="py-2">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {result.monthlyBreakdown.map((m) => (
+                    <tr key={m.sortKey}>
+                      <td className="py-2 pr-4 font-medium text-charcoal">{m.month}</td>
+                      <td className="py-2 pr-4 text-teal">
+                        {m.paidCount > 0 ? `${formatPrice(m.paidTotal)} (${m.paidCount})` : '—'}
+                      </td>
+                      <td className="py-2 pr-4 text-coral">
+                        {m.unpaidCount > 0 ? `${formatPrice(m.unpaidTotal)} (${m.unpaidCount})` : '—'}
+                      </td>
+                      <td className="py-2 font-semibold text-charcoal">{formatPrice(m.paidTotal + m.unpaidTotal)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Individual records */}
+        {result.records.length > 0 && (
+          <div className="card space-y-3">
+            <h3 className="font-bold text-charcoal">Imported Records ({result.records.length})</h3>
+            <div className="max-h-96 overflow-y-auto overflow-x-auto">
+              <table className="w-full min-w-[560px] text-sm">
+                <thead className="border-b border-gray-100 sticky top-0 bg-white">
+                  <tr className="text-left text-xs text-gray-400 uppercase">
+                    <th className="py-2 pr-4">Date</th>
+                    <th className="py-2 pr-4">Name</th>
+                    <th className="py-2 pr-4">Service</th>
+                    <th className="py-2 pr-4">Amount</th>
+                    <th className="py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {result.records.map((r, i) => (
+                    <tr key={i}>
+                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
+                        {new Date(r.date).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="py-2 pr-4 text-charcoal">{r.name}</td>
+                      <td className="py-2 pr-4 text-gray-500">{r.service}</td>
+                      <td className="py-2 pr-4 font-medium text-charcoal">{formatPrice(r.amount)}</td>
+                      <td className="py-2">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${r.paid ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+                          {r.paid ? 'Paid' : 'Unpaid'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

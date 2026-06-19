@@ -8,6 +8,8 @@ import { friendlyError } from '@/lib/api-error';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+type MonthBucket = { month: string; sortKey: string; paidCount: number; paidTotal: number; unpaidCount: number; unpaidTotal: number };
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -27,6 +29,9 @@ export async function POST(req: NextRequest) {
     let unpaidCount = 0;
     let unpaidTotal = 0;
 
+    const monthly = new Map<string, MonthBucket>();
+    const records: { name: string; date: string; amount: number; paid: boolean; service: string }[] = [];
+
     for (const row of rows) {
       try {
         const email = row.email ?? placeholderEmail(row.phone!);
@@ -35,6 +40,13 @@ export async function POST(req: NextRequest) {
         if (!before) customersCreated++;
 
         const invoiceNumber = await generateInvoiceNumber(db);
+
+        const sortKey = `${row.date.getFullYear()}-${String(row.date.getMonth() + 1).padStart(2, '0')}`;
+        const monthLabel = row.date.toLocaleDateString('en-KE', { month: 'short', year: 'numeric' });
+        if (!monthly.has(sortKey)) {
+          monthly.set(sortKey, { month: monthLabel, sortKey, paidCount: 0, paidTotal: 0, unpaidCount: 0, unpaidTotal: 0 });
+        }
+        const bucket = monthly.get(sortKey)!;
 
         if (row.paid) {
           await db.invoice.create({
@@ -54,6 +66,8 @@ export async function POST(req: NextRequest) {
           });
           paidCount++;
           paidTotal += row.amount;
+          bucket.paidCount++;
+          bucket.paidTotal += row.amount;
         } else {
           await db.invoice.create({
             data: {
@@ -73,11 +87,24 @@ export async function POST(req: NextRequest) {
           });
           unpaidCount++;
           unpaidTotal += row.amount;
+          bucket.unpaidCount++;
+          bucket.unpaidTotal += row.amount;
         }
+
+        records.push({
+          name: row.name,
+          date: row.date.toISOString(),
+          amount: row.amount,
+          paid: row.paid,
+          service: row.service,
+        });
       } catch (rowErr) {
         errors.push({ row: 0, reason: `${row.name}: ${friendlyError(rowErr, 'admin/customers/import row')}` });
       }
     }
+
+    const monthlyBreakdown = Array.from(monthly.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    records.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     return NextResponse.json({
       totalRows: rows.length,
@@ -86,6 +113,8 @@ export async function POST(req: NextRequest) {
       paidTotal,
       unpaidCount,
       unpaidTotal,
+      monthlyBreakdown,
+      records,
       errors,
     });
   } catch (err) {
