@@ -45,7 +45,7 @@ export default function NewItemForm() {
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Item Name</label>
           <input name="name" required value={form.name} onChange={handleChange} className={inputClass} />
@@ -64,7 +64,7 @@ export default function NewItemForm() {
         </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Starting Quantity</label>
           <input name="quantity" type="number" min={0} value={form.quantity} onChange={handleChange} className={inputClass} />
@@ -75,7 +75,7 @@ export default function NewItemForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Unit Cost (KES)</label>
           <input name="unitCost" type="number" min={0} value={form.unitCost} onChange={handleChange} className={inputClass} />

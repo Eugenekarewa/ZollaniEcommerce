@@ -54,7 +54,7 @@ export default function AddExpenseForm() {
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Category</label>
           <select name="category" required value={form.category} onChange={handleChange} className={inputClass}>
@@ -71,7 +71,7 @@ export default function AddExpenseForm() {
         <label className="block text-sm font-medium text-charcoal mb-1.5">Description</label>
         <input name="description" required value={form.description} onChange={handleChange} className={inputClass} />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Date</label>
           <input name="date" type="date" required value={form.date} onChange={handleChange} className={inputClass} />

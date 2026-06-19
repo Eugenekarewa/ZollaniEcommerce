@@ -35,32 +35,34 @@ export default async function AdminExpensesPage() {
         <div className="card py-16 text-center text-gray-400">No expenses recorded yet.</div>
       ) : (
         <div className="card overflow-hidden p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr className="text-left text-xs text-gray-400 uppercase">
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Description</th>
-                <th className="px-4 py-3">Vendor</th>
-                <th className="px-4 py-3">Amount</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {expenses.map((e) => (
-                <tr key={e.id} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-3 text-gray-500">{e.date.toLocaleDateString('en-KE')}</td>
-                  <td className="px-4 py-3">
-                    <span className="rounded-full bg-teal-50 px-2.5 py-0.5 text-xs text-teal">{e.category}</span>
-                  </td>
-                  <td className="px-4 py-3 text-charcoal">{e.description}</td>
-                  <td className="px-4 py-3 text-gray-500">{e.vendor ?? '—'}</td>
-                  <td className="px-4 py-3 font-medium text-coral">{formatPrice(e.amount)}</td>
-                  <td className="px-4 py-3"><DeleteExpenseButton id={e.id} /></td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr className="text-left text-xs text-gray-400 uppercase">
+                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">Category</th>
+                  <th className="px-4 py-3">Description</th>
+                  <th className="px-4 py-3">Vendor</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {expenses.map((e) => (
+                  <tr key={e.id} className="hover:bg-gray-50/50">
+                    <td className="px-4 py-3 text-gray-500">{e.date.toLocaleDateString('en-KE')}</td>
+                    <td className="px-4 py-3">
+                      <span className="rounded-full bg-teal-50 px-2.5 py-0.5 text-xs text-teal">{e.category}</span>
+                    </td>
+                    <td className="px-4 py-3 text-charcoal">{e.description}</td>
+                    <td className="px-4 py-3 text-gray-500">{e.vendor ?? '—'}</td>
+                    <td className="px-4 py-3 font-medium text-coral">{formatPrice(e.amount)}</td>
+                    <td className="px-4 py-3"><DeleteExpenseButton id={e.id} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

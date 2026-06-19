@@ -25,43 +25,45 @@ export default async function AdminCustomersPage() {
         </div>
       ) : (
         <div className="card overflow-hidden p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr className="text-left text-xs text-gray-400 uppercase">
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3">Company</th>
-                <th className="px-4 py-3">Tags</th>
-                <th className="px-4 py-3">Requests</th>
-                <th className="px-4 py-3">Invoices</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {customers.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/customers/${c.id}`} className="font-medium text-coral hover:underline">
-                      {c.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">
-                    <p>{c.email}</p>
-                    {c.phone && <p className="text-xs text-gray-400">{c.phone}</p>}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{c.company ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {c.tags.map((tag) => (
-                        <span key={tag} className="rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal">{tag}</span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{c._count.submissions}</td>
-                  <td className="px-4 py-3 text-gray-500">{c._count.invoices}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr className="text-left text-xs text-gray-400 uppercase">
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Contact</th>
+                  <th className="px-4 py-3">Company</th>
+                  <th className="px-4 py-3">Tags</th>
+                  <th className="px-4 py-3">Requests</th>
+                  <th className="px-4 py-3">Invoices</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {customers.map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50/50">
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/customers/${c.id}`} className="font-medium text-coral hover:underline">
+                        {c.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">
+                      <p>{c.email}</p>
+                      {c.phone && <p className="text-xs text-gray-400">{c.phone}</p>}
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">{c.company ?? '—'}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {c.tags.map((tag) => (
+                          <span key={tag} className="rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal">{tag}</span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">{c._count.submissions}</td>
+                    <td className="px-4 py-3 text-gray-500">{c._count.invoices}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

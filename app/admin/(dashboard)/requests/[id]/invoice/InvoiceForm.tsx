@@ -55,7 +55,7 @@ export default function InvoiceForm({ request }: { request: Request }) {
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Client Name</label>
           <input name="clientName" required value={form.clientName} onChange={handleChange} className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200" />
@@ -85,7 +85,7 @@ export default function InvoiceForm({ request }: { request: Request }) {
           className="w-full resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Amount (KES)</label>
           <input name="amount" type="number" required min={1} value={form.amount || ''} onChange={handleChange} className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-coral focus:ring-2 focus:ring-coral-200" />

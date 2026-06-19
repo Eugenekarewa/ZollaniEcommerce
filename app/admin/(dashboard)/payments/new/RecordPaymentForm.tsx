@@ -54,7 +54,7 @@ export default function RecordPaymentForm() {
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Client Name</label>
           <input name="clientName" required value={form.clientName} onChange={handleChange} className={inputClass} />
@@ -76,7 +76,7 @@ export default function RecordPaymentForm() {
         <label className="block text-sm font-medium text-charcoal mb-1.5">Description</label>
         <textarea name="description" required rows={2} value={form.description} onChange={handleChange} className={`${inputClass} resize-none`} />
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-charcoal mb-1.5">Amount (KES)</label>
           <input name="amount" type="number" min={1} required value={form.amount || ''} onChange={handleChange} className={inputClass} />

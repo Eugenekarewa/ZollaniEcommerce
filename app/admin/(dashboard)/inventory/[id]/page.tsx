@@ -23,7 +23,7 @@ export default async function InventoryItemPage({ params }: { params: Promise<{ 
         <p className="text-sm text-gray-500 mt-1">{item.category} {item.sku && `· ${item.sku}`}</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card">
           <p className="text-sm text-gray-500">Current Stock</p>
           <p className={`text-2xl font-black ${low ? 'text-red-600' : 'text-charcoal'}`}>{item.quantity}</p>
