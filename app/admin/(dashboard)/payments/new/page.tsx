@@ -4,11 +4,11 @@ export default function RecordPaymentPage() {
   return (
     <div className="space-y-6 max-w-xl">
       <div>
-        <h1 className="text-2xl font-black text-charcoal">Record a Payment</h1>
+        <h1 className="text-2xl font-black text-charcoal">Add Client Record</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Log a payment that already happened — cash, M-Pesa, bank transfer, or an earlier-month
-          transaction not yet in the system. This creates a paid invoice with the date you specify,
-          so your revenue reports stay accurate.
+          Manually enter a client and their service record — the same details as a row in your
+          spreadsheet: name, contact, service, amount charged, any cost incurred, payment status,
+          and date. Works for paid, partially paid, unpaid, or cancelled jobs.
         </p>
       </div>
       <RecordPaymentForm />

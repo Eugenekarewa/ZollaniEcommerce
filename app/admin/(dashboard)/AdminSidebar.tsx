@@ -84,7 +84,7 @@ export default function AdminSidebar() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-coral/15 text-coral hover:bg-coral/25 transition-colors font-medium"
             >
-              <PlusCircle className="h-4 w-4 shrink-0" /> Record Payment
+              <PlusCircle className="h-4 w-4 shrink-0" /> Add Client Record
             </Link>
           </div>
         </nav>

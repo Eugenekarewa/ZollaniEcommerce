@@ -17,7 +17,7 @@ export function friendlyError(err: unknown, context: string): string {
   }
 
   if (err instanceof ZodError) {
-    return 'Some fields are invalid. Please check the form and try again.';
+    return err.issues[0]?.message ?? 'Some fields are invalid. Please check the form and try again.';
   }
 
   return 'Something went wrong. Please try again.';

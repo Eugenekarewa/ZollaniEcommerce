@@ -6,6 +6,7 @@ export const EXPENSE_CATEGORIES = [
   'Marketing',
   'Transport',
   'Equipment',
+  'Service Cost',
   'Imported',
   'Other',
 ];
