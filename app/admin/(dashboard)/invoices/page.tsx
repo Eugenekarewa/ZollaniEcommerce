@@ -40,7 +40,7 @@ export default async function AdminInvoicesPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {invoices.map((inv) => {
-                  const isOverdue = inv.status === 'sent' && inv.dueDate && inv.dueDate.getTime() < Date.now();
+                  const isOverdue = (inv.status === 'sent' || inv.status === 'partial') && inv.dueDate && inv.dueDate.getTime() < Date.now();
                   return (
                     <tr key={inv.id} className="hover:bg-gray-50/50">
                       <td className="px-4 py-3 font-mono text-xs text-gray-500">
@@ -53,7 +53,12 @@ export default async function AdminInvoicesPage() {
                         <p className="text-xs text-gray-400">{inv.clientEmail}</p>
                       </td>
                       <td className="px-4 py-3 text-gray-500">{inv.service}</td>
-                      <td className="px-4 py-3 font-medium text-coral">{formatPrice(inv.amount)}</td>
+                      <td className="px-4 py-3 font-medium text-coral">
+                        {formatPrice(inv.amount)}
+                        {inv.status === 'partial' && (
+                          <p className="text-xs font-normal text-gray-400">{formatPrice(inv.amountPaid)} paid</p>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-xs">
                         {inv.status === 'paid' && inv.paidAt ? (
                           <span className="text-green-700">Paid {inv.paidAt.toLocaleDateString('en-KE')}</span>

@@ -5,20 +5,35 @@ import { useRouter } from 'next/navigation';
 import { Loader2, Upload, CheckCircle2, AlertTriangle, Calendar } from 'lucide-react';
 import { formatPrice } from '@/lib/invoice';
 
-type MonthBucket = { month: string; sortKey: string; paidCount: number; paidTotal: number; unpaidCount: number; unpaidTotal: number };
-type ImportRecord = { name: string; date: string; amount: number; paid: boolean; service: string };
+type MonthBucket = {
+  month: string; sortKey: string;
+  paidCount: number; paidTotal: number;
+  unpaidCount: number; unpaidTotal: number;
+  partialCount: number; partialTotal: number;
+  cancelledCount: number;
+};
+type ImportRecord = { name: string; date: string; amount: number; amountPaid: number; status: string; service: string };
+type SheetHeaders = { sheet: string; headers: string[] };
 
 type ImportResult = {
   totalRows: number;
   customersCreated: number;
-  paidCount: number;
-  paidTotal: number;
-  unpaidCount: number;
-  unpaidTotal: number;
+  paidCount: number; paidTotal: number;
+  unpaidCount: number; unpaidTotal: number;
+  partialCount: number; partialTotal: number; partialOutstanding: number;
+  cancelledCount: number;
+  expensesCreated: number; expensesTotal: number;
   monthlyBreakdown: MonthBucket[];
   records: ImportRecord[];
-  errors: { row: number; reason: string }[];
-  detectedHeaders: string[];
+  errors: { sheet: string; row: number; reason: string }[];
+  detectedHeaders: SheetHeaders[];
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  paid: 'bg-green-100 text-green-800',
+  partial: 'bg-yellow-100 text-yellow-800',
+  unpaid: 'bg-blue-100 text-blue-800',
+  cancelled: 'bg-red-100 text-red-800',
 };
 
 export default function ImportForm() {
@@ -61,7 +76,7 @@ export default function ImportForm() {
             <CheckCircle2 className="h-6 w-6" />
             <h2 className="font-bold text-charcoal">Import Complete</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
               <p className="text-xs text-gray-500">Rows Processed</p>
               <p className="text-xl font-black text-charcoal">{result.totalRows}</p>
@@ -75,15 +90,31 @@ export default function ImportForm() {
               <p className="text-xl font-black text-red-600">{result.errors.length}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Paid Invoices</p>
+              <p className="text-xs text-gray-500">Cancelled</p>
+              <p className="text-xl font-black text-gray-500">{result.cancelledCount}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Paid</p>
               <p className="text-xl font-black text-teal">{result.paidCount}</p>
               <p className="text-xs text-gray-400">{formatPrice(result.paidTotal)}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Unpaid Invoices</p>
+              <p className="text-xs text-gray-500">Partially Paid</p>
+              <p className="text-xl font-black text-yellow-600">{result.partialCount}</p>
+              <p className="text-xs text-gray-400">{formatPrice(result.partialTotal)} received, {formatPrice(result.partialOutstanding)} owed</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Unpaid</p>
               <p className="text-xl font-black text-coral">{result.unpaidCount}</p>
               <p className="text-xs text-gray-400">{formatPrice(result.unpaidTotal)}</p>
             </div>
+            {result.expensesCreated > 0 && (
+              <div>
+                <p className="text-xs text-gray-500">Expenses Logged</p>
+                <p className="text-xl font-black text-charcoal">{result.expensesCreated}</p>
+                <p className="text-xs text-gray-400">{formatPrice(result.expensesTotal)}</p>
+              </div>
+            )}
           </div>
 
           {result.errors.length > 0 && (
@@ -93,19 +124,22 @@ export default function ImportForm() {
               </p>
               <ul className="text-xs text-red-600 space-y-1 max-h-40 overflow-y-auto">
                 {result.errors.map((e, i) => (
-                  <li key={i}>{e.row > 0 ? `Row ${e.row}: ` : ''}{e.reason}</li>
+                  <li key={i}>{e.sheet ? `[${e.sheet}] ` : ''}{e.row > 0 ? `Row ${e.row}: ` : ''}{e.reason}</li>
                 ))}
               </ul>
               {result.errors.length >= result.totalRows / 2 && (
-                <div className="rounded-lg bg-white border border-red-200 p-3 text-xs text-gray-600">
-                  <p className="font-semibold text-charcoal mb-1">Columns detected in your file:</p>
-                  <p className="font-mono">
-                    {result.detectedHeaders.length > 0 ? result.detectedHeaders.join(' · ') : '(none found — is the file empty or in an unsupported format?)'}
-                  </p>
-                  <p className="mt-2 text-gray-500">
+                <div className="rounded-lg bg-white border border-red-200 p-3 text-xs text-gray-600 space-y-2">
+                  <p className="font-semibold text-charcoal">Columns detected per sheet:</p>
+                  {result.detectedHeaders.length > 0 ? (
+                    result.detectedHeaders.map((sh) => (
+                      <p key={sh.sheet}><span className="font-semibold">{sh.sheet}:</span> <span className="font-mono">{sh.headers.join(' · ')}</span></p>
+                    ))
+                  ) : (
+                    <p>(none found — is the file empty or in an unsupported format?)</p>
+                  )}
+                  <p className="text-gray-500">
                     If &quot;Name&quot; isn&apos;t in that list, the importer didn&apos;t find your header row —
-                    check there isn&apos;t a title or blank row above your actual column headers, and that
-                    the data is on the first sheet of the file.
+                    check there isn&apos;t a title or blank row above your actual column headers.
                   </p>
                 </div>
               )}
@@ -126,26 +160,24 @@ export default function ImportForm() {
               <Calendar className="h-4 w-4 text-coral" /> By Month
             </h3>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[480px] text-sm">
+              <table className="w-full min-w-[600px] text-sm">
                 <thead className="border-b border-gray-100">
                   <tr className="text-left text-xs text-gray-400 uppercase">
                     <th className="py-2 pr-4">Month</th>
                     <th className="py-2 pr-4">Paid</th>
+                    <th className="py-2 pr-4">Partial</th>
                     <th className="py-2 pr-4">Unpaid</th>
-                    <th className="py-2">Total</th>
+                    <th className="py-2">Cancelled</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {result.monthlyBreakdown.map((m) => (
                     <tr key={m.sortKey}>
                       <td className="py-2 pr-4 font-medium text-charcoal">{m.month}</td>
-                      <td className="py-2 pr-4 text-teal">
-                        {m.paidCount > 0 ? `${formatPrice(m.paidTotal)} (${m.paidCount})` : '—'}
-                      </td>
-                      <td className="py-2 pr-4 text-coral">
-                        {m.unpaidCount > 0 ? `${formatPrice(m.unpaidTotal)} (${m.unpaidCount})` : '—'}
-                      </td>
-                      <td className="py-2 font-semibold text-charcoal">{formatPrice(m.paidTotal + m.unpaidTotal)}</td>
+                      <td className="py-2 pr-4 text-teal">{m.paidCount > 0 ? `${formatPrice(m.paidTotal)} (${m.paidCount})` : '—'}</td>
+                      <td className="py-2 pr-4 text-yellow-600">{m.partialCount > 0 ? `${formatPrice(m.partialTotal)} (${m.partialCount})` : '—'}</td>
+                      <td className="py-2 pr-4 text-coral">{m.unpaidCount > 0 ? `${formatPrice(m.unpaidTotal)} (${m.unpaidCount})` : '—'}</td>
+                      <td className="py-2 text-gray-400">{m.cancelledCount > 0 ? m.cancelledCount : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -159,7 +191,7 @@ export default function ImportForm() {
           <div className="card space-y-3">
             <h3 className="font-bold text-charcoal">Imported Records ({result.records.length})</h3>
             <div className="max-h-96 overflow-y-auto overflow-x-auto">
-              <table className="w-full min-w-[560px] text-sm">
+              <table className="w-full min-w-[600px] text-sm">
                 <thead className="border-b border-gray-100 sticky top-0 bg-white">
                   <tr className="text-left text-xs text-gray-400 uppercase">
                     <th className="py-2 pr-4">Date</th>
@@ -177,10 +209,13 @@ export default function ImportForm() {
                       </td>
                       <td className="py-2 pr-4 text-charcoal">{r.name}</td>
                       <td className="py-2 pr-4 text-gray-500">{r.service}</td>
-                      <td className="py-2 pr-4 font-medium text-charcoal">{formatPrice(r.amount)}</td>
+                      <td className="py-2 pr-4 font-medium text-charcoal">
+                        {formatPrice(r.amount)}
+                        {r.status === 'partial' && <span className="text-xs text-gray-400"> ({formatPrice(r.amountPaid)} paid)</span>}
+                      </td>
                       <td className="py-2">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${r.paid ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
-                          {r.paid ? 'Paid' : 'Unpaid'}
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${STATUS_STYLES[r.status] ?? 'bg-gray-100 text-gray-700'}`}>
+                          {r.status}
                         </span>
                       </td>
                     </tr>
@@ -199,6 +234,7 @@ export default function ImportForm() {
       <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-xs text-gray-500 space-y-1">
         <p className="font-semibold text-charcoal text-sm mb-1">Expected columns (any order, header names are flexible):</p>
         <p><strong>Name</strong> · <strong>Email or Phone</strong> · <strong>Amount</strong> · <strong>Paid/Unpaid</strong> · <strong>Date</strong> · <strong>Service</strong></p>
+        <p>Also recognized: <strong>Expense</strong> (logged automatically), <strong>Served By</strong>, partial payments like &quot;Paid 800&quot;, and &quot;Cancelled&quot;. If your file has a separate sheet/tab per month, all of them are imported together.</p>
       </div>
 
       <div>
@@ -220,7 +256,7 @@ export default function ImportForm() {
           className="mt-0.5 accent-coral"
         />
         <span className="text-sm">
-          <span className="font-medium text-charcoal">Send automatic payment reminders for imported unpaid invoices</span>
+          <span className="font-medium text-charcoal">Send automatic payment reminders for imported unpaid/partial invoices</span>
           <p className="text-gray-500 mt-0.5">
             Off by default — historical debts won&apos;t suddenly email old customers. Turn this on
             if you want the normal due-soon / overdue / final-notice reminders to apply to them.

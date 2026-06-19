@@ -1,28 +1,30 @@
 import Link from 'next/link';
 import { Inbox, DollarSign, Users, AlertTriangle, Package, BarChart3 } from 'lucide-react';
 import { db } from '@/lib/db';
-import { formatPrice } from '@/lib/invoice';
+import { formatPrice, INVOICE_STATUSES } from '@/lib/invoice';
 import { isLowStock } from '@/lib/inventory';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
-  const [customerCount, newRequests, overdueCount, recentInvoices, revenue, inventoryItems] = await Promise.all([
+  const [customerCount, newRequests, overdueCount, recentInvoices, paidRevenue, partialRevenue, inventoryItems] = await Promise.all([
     db.customer.count(),
     db.contactSubmission.count({ where: { status: 'new' } }),
     db.invoice.count({ where: { status: 'sent', dueDate: { lt: new Date() } } }),
     db.invoice.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
     db.invoice.aggregate({ _sum: { amount: true }, where: { status: 'paid' } }),
+    db.invoice.aggregate({ _sum: { amountPaid: true }, where: { status: 'partial' } }),
     db.inventoryItem.findMany({ select: { name: true, quantity: true, reorderLevel: true } }),
   ]);
 
   const lowStockItems = inventoryItems.filter(isLowStock);
+  const revenueCollected = (paidRevenue._sum.amount ?? 0) + (partialRevenue._sum.amountPaid ?? 0);
 
   const stats = [
     { icon: <Users className="h-6 w-6 text-coral" />, label: 'Customers', value: customerCount, href: '/admin/customers' },
     { icon: <Inbox className="h-6 w-6 text-coral" />, label: 'New Requests', value: newRequests, href: '/admin/requests' },
     { icon: <AlertTriangle className="h-6 w-6 text-coral" />, label: 'Overdue Invoices', value: overdueCount, href: '/admin/invoices' },
-    { icon: <DollarSign className="h-6 w-6 text-teal" />, label: 'Revenue Collected', value: formatPrice(revenue._sum.amount ?? 0), href: '/admin/invoices' },
+    { icon: <DollarSign className="h-6 w-6 text-teal" />, label: 'Revenue Collected', value: formatPrice(revenueCollected), href: '/admin/invoices' },
   ];
 
   return (
@@ -85,7 +87,7 @@ export default async function AdminDashboard() {
                     <td className="py-2.5 pr-4 text-charcoal">{inv.clientName}</td>
                     <td className="py-2.5 pr-4 font-medium text-coral">{formatPrice(inv.amount)}</td>
                     <td className="py-2.5">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${inv.status === 'paid' ? 'bg-green-100 text-green-800' : inv.status === 'sent' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${INVOICE_STATUSES[inv.status]?.color ?? 'bg-gray-100 text-gray-700'}`}>
                         {inv.status}
                       </span>
                     </td>

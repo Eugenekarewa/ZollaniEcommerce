@@ -22,6 +22,8 @@ export default async function InvoicePage({
   if (!invoice) notFound();
 
   const isPaid = invoice.status === 'paid';
+  const isPartial = invoice.status === 'partial';
+  const remainingBalance = invoice.amount - invoice.amountPaid;
   const statusInfo = INVOICE_STATUSES[invoice.status] ?? { label: invoice.status, color: 'bg-gray-100 text-gray-700' };
 
   return (
@@ -62,9 +64,16 @@ export default async function InvoicePage({
             </div>
           </div>
 
+          {isPartial && (
+            <div className="border-t pt-3 flex justify-between text-sm text-teal">
+              <span>Already Paid</span>
+              <span className="font-medium">{formatPrice(invoice.amountPaid)}</span>
+            </div>
+          )}
+
           <div className="border-t pt-3 flex justify-between font-bold text-charcoal">
-            <span>Total Due</span>
-            <span className="text-coral text-lg">{formatPrice(invoice.amount)}</span>
+            <span>{isPartial ? 'Remaining Balance' : 'Total Due'}</span>
+            <span className="text-coral text-lg">{formatPrice(isPartial ? remainingBalance : invoice.amount)}</span>
           </div>
         </div>
 

@@ -17,10 +17,10 @@ export async function getMonthlyFinancials(db: PrismaClient, monthsBack = 6) {
   const buckets = monthBuckets(monthsBack);
   const rangeStart = buckets[0].start;
 
-  const [paidInvoices, expenses] = await Promise.all([
+  const [receivedInvoices, expenses] = await Promise.all([
     db.invoice.findMany({
-      where: { status: 'paid', paidAt: { gte: rangeStart } },
-      select: { amount: true, paidAt: true },
+      where: { status: { in: ['paid', 'partial'] }, paidAt: { gte: rangeStart } },
+      select: { amount: true, amountPaid: true, status: true, paidAt: true },
     }),
     db.expense.findMany({
       where: { date: { gte: rangeStart } },
@@ -29,9 +29,9 @@ export async function getMonthlyFinancials(db: PrismaClient, monthsBack = 6) {
   ]);
 
   return buckets.map((b) => {
-    const revenue = paidInvoices
+    const revenue = receivedInvoices
       .filter((i) => i.paidAt && i.paidAt >= b.start && i.paidAt < b.end)
-      .reduce((s, i) => s + i.amount, 0);
+      .reduce((s, i) => s + (i.status === 'paid' ? i.amount : i.amountPaid), 0);
     const expenseTotal = expenses
       .filter((e) => e.date >= b.start && e.date < b.end)
       .reduce((s, e) => s + e.amount, 0);
@@ -60,14 +60,15 @@ export async function getTopServices(db: PrismaClient, monthsBack = 6) {
   const buckets = monthBuckets(monthsBack);
   const rangeStart = buckets[0].start;
 
-  const paidInvoices = await db.invoice.findMany({
-    where: { status: 'paid', paidAt: { gte: rangeStart } },
-    select: { service: true, amount: true },
+  const receivedInvoices = await db.invoice.findMany({
+    where: { status: { in: ['paid', 'partial'] }, paidAt: { gte: rangeStart } },
+    select: { service: true, amount: true, amountPaid: true, status: true },
   });
 
   const byService = new Map<string, number>();
-  for (const inv of paidInvoices) {
-    byService.set(inv.service, (byService.get(inv.service) ?? 0) + inv.amount);
+  for (const inv of receivedInvoices) {
+    const received = inv.status === 'paid' ? inv.amount : inv.amountPaid;
+    byService.set(inv.service, (byService.get(inv.service) ?? 0) + received);
   }
 
   return Array.from(byService.entries())

@@ -62,7 +62,8 @@ model Invoice {
   service             String
   description         String
   amount              Int // KES
-  status              String             @default("draft") // draft, sent, paid, cancelled
+  amountPaid          Int                @default(0) // KES already received — for partial payments
+  status              String             @default("draft") // draft, sent, partial, paid, cancelled
   paymentMethod       String?            // paystack, cash, mpesa, bank, other
   dueDate             DateTime?
   reminderStage       Int                @default(0) // 0=none, 1=due-soon sent, 2=overdue sent, 3=final notice sent

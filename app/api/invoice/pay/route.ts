@@ -19,10 +19,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invoice has been cancelled' }, { status: 400 });
     }
 
+    const remainingBalance = invoice.amount - invoice.amountPaid;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://zollani.co.ke';
     const { authorization_url } = await initializeTransaction({
       email:       invoice.clientEmail,
-      amount:      invoice.amount,
+      amount:      remainingBalance,
       reference:   invoice.id,
       callbackUrl: `${siteUrl}/invoice/${invoice.id}`,
     });

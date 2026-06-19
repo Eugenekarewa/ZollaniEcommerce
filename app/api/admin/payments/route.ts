@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
         service:       data.service,
         description:   data.description,
         amount:        data.amount,
+        amountPaid:    data.amount,
         status:        'paid',
         paymentMethod: data.paymentMethod,
         paidAt:        new Date(data.paidAt),

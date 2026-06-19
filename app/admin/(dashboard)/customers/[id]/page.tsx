@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Phone, Building2 } from 'lucide-react';
 import { db } from '@/lib/db';
-import { formatPrice } from '@/lib/invoice';
+import { formatPrice, INVOICE_STATUSES } from '@/lib/invoice';
 import CustomerNotesForm from './CustomerNotesForm';
 
 export const dynamic = 'force-dynamic';
@@ -18,8 +18,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   });
   if (!customer) notFound();
 
-  const totalPaid = customer.invoices.filter((i) => i.status === 'paid').reduce((s, i) => s + i.amount, 0);
-  const totalOutstanding = customer.invoices.filter((i) => i.status === 'sent').reduce((s, i) => s + i.amount, 0);
+  const totalPaid = customer.invoices.reduce((s, i) => s + (i.status === 'paid' ? i.amount : i.status === 'partial' ? i.amountPaid : 0), 0);
+  const totalOutstanding = customer.invoices.reduce((s, i) => {
+    if (i.status === 'sent') return s + i.amount;
+    if (i.status === 'partial') return s + (i.amount - i.amountPaid);
+    return s;
+  }, 0);
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -83,7 +87,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-coral">{formatPrice(inv.amount)}</p>
-                  <span className={`text-xs rounded-full px-2 py-0.5 ${inv.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+                  <span className={`text-xs rounded-full px-2 py-0.5 capitalize ${INVOICE_STATUSES[inv.status]?.color ?? 'bg-gray-100 text-gray-700'}`}>
                     {inv.status}
                   </span>
                 </div>

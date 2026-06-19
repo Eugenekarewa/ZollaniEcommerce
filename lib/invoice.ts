@@ -12,6 +12,7 @@ export async function generateInvoiceNumber(db: { invoice: { count: () => Promis
 export const INVOICE_STATUSES: Record<string, { label: string; color: string }> = {
   draft:     { label: 'Draft',     color: 'bg-gray-100 text-gray-700' },
   sent:      { label: 'Sent',      color: 'bg-blue-100 text-blue-800' },
+  partial:   { label: 'Partial',   color: 'bg-yellow-100 text-yellow-800' },
   paid:      { label: 'Paid',      color: 'bg-green-100 text-green-800' },
   cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-800' },
 };

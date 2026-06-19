@@ -21,9 +21,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Payment not successful' }, { status: 402 });
     }
 
+    const existing = await db.invoice.findUnique({ where: { id: invoiceId }, select: { amount: true } });
+
     const invoice = await db.invoice.update({
       where: { id: invoiceId },
-      data:  { status: 'paid', paystackRef: reference, paidAt: new Date() },
+      data:  { status: 'paid', paystackRef: reference, paidAt: new Date(), amountPaid: existing?.amount ?? 0 },
     });
 
     await resend().emails.send(

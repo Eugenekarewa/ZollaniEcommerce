@@ -8,8 +8,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   try {
     const { status } = await req.json();
-    const data: { status: string; paidAt?: Date } = { status };
-    if (status === 'paid') data.paidAt = new Date();
+    const data: { status: string; paidAt?: Date; amountPaid?: number } = { status };
+    if (status === 'paid') {
+      const existing = await db.invoice.findUnique({ where: { id }, select: { amount: true } });
+      data.paidAt = new Date();
+      data.amountPaid = existing?.amount ?? 0;
+    }
     const invoice = await db.invoice.update({ where: { id }, data });
     return NextResponse.json(invoice);
   } catch (err) {
