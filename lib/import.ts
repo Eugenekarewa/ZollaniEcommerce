@@ -21,7 +21,7 @@ export type SheetHeaders = { sheet: string; headers: string[] };
 
 const NAME_CANDIDATES = ['name', 'customername', 'clientname', 'client', 'fullname', 'customer'];
 const SERVICE_CANDIDATES = ['service', 'servicetype', 'serviceoffered', 'description', 'workdone', 'job'];
-const AMOUNT_CANDIDATES = ['amount', 'amountkes', 'amountpaid', 'amountcharged', 'price', 'cost', 'total', 'totalamount', 'fee', 'kes', 'ksh', 'amountksh', 'charge'];
+const AMOUNT_CANDIDATES = ['amount', 'amountkes', 'amountpaid', 'amountcharged', 'amntcharge', 'amntcharged', 'amountcharge', 'price', 'cost', 'total', 'totalamount', 'fee', 'kes', 'ksh', 'amountksh', 'charge'];
 const PROFIT_CANDIDATES = ['profit', 'margin', 'netprofit'];
 const EXPENSE_CANDIDATES = ['expense', 'expenses', 'expensekes', 'materialcost', 'partscost'];
 const EMAIL_CANDIDATES = ['email', 'emailaddress', 'mail'];
@@ -29,7 +29,8 @@ const PHONE_CANDIDATES = ['phone', 'phonenumber', 'mobile', 'tel', 'telephone', 
 const COMBINED_CONTACT_CANDIDATES = ['emailphone', 'emailorphone', 'contact', 'contactinfo'];
 const STATUS_CANDIDATES = ['paidunpaidindicator', 'paidunpaid', 'status', 'paid', 'paymentstatus'];
 const DATE_CANDIDATES = ['date', 'datepaid', 'paymentdate', 'dateofservice', 'servicedate', 'dateordered', 'when', 'transactiondate'];
-const SERVED_BY_CANDIDATES = ['servedby', 'staff', 'staffname', 'technician', 'handledby'];
+const SERVED_BY_CANDIDATES = ['servedby', 'servdby', 'staff', 'staffname', 'technician', 'handledby'];
+const MONTH_NAMES = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
 function normalizeHeader(h: string) {
   return h.toLowerCase().replace(/[^a-z]/g, '');
@@ -129,6 +130,27 @@ function parseDate(raw: unknown): Date {
   return isNaN(fallback.getTime()) ? new Date() : fallback;
 }
 
+/** Some sheets are organized one-tab-per-month with no date column at all
+ * (the row's position in that tab implies the month). Reads the tab name
+ * (e.g. "March", "March 2026", "Mar26") and returns the 1st of that month. */
+function parseMonthFromSheetName(sheetName: string): Date | null {
+  const s = sheetName.toLowerCase();
+  for (let m = 0; m < MONTH_NAMES.length; m++) {
+    const full = MONTH_NAMES[m];
+    const abbr = full.slice(0, 3);
+    if (s.includes(full) || new RegExp(`\\b${abbr}\\b`).test(s)) {
+      const yearMatch = s.match(/\b(20\d{2}|\d{2})\b/);
+      let year = new Date().getFullYear();
+      if (yearMatch) {
+        const y = yearMatch[1];
+        year = y.length === 2 ? 2000 + Number(y) : Number(y);
+      }
+      return new Date(year, m, 1);
+    }
+  }
+  return null;
+}
+
 function findHeaderRowIndex(rawRows: unknown[][]): number {
   for (let i = 0; i < Math.min(rawRows.length, 10); i++) {
     const cells = (rawRows[i] ?? []).map((c) => normalizeHeader(String(c ?? '')));
@@ -150,6 +172,16 @@ function parseSheet(sheet: XLSX.WorkSheet, sheetName: string): {
 
   const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '', range: headerRowIndex });
 
+  // If no header matches a known "name" label (e.g. the cell was overwritten
+  // with a customer's name by mistake), fall back to the leftmost column —
+  // every observed sheet puts the customer name there regardless of header text.
+  const rowKeys = Object.keys(raw[0] ?? {});
+  const nameKey = rowKeys.find((k) => NAME_CANDIDATES.includes(normalizeHeader(k))) ?? rowKeys[0];
+
+  // Sheets organized one-tab-per-month sometimes have no date column at all —
+  // fall back to the 1st of the month named in the tab itself.
+  const sheetMonthFallback = parseMonthFromSheetName(sheetName);
+
   const rows: ImportRow[] = [];
   const errors: ImportError[] = [];
 
@@ -161,7 +193,7 @@ function parseSheet(sheet: XLSX.WorkSheet, sheetName: string): {
     const isBlankRow = Object.values(r).every((v) => String(v ?? '').trim() === '');
     if (isBlankRow) return;
 
-    const name = String(findValue(r, NAME_CANDIDATES) ?? '').trim();
+    const name = String((nameKey !== undefined ? r[nameKey] : findValue(r, NAME_CANDIDATES)) ?? '').trim();
     if (!name) { errors.push({ sheet: sheetName, row: rowNum, reason: 'Missing name' }); return; }
 
     let email = String(findValue(r, EMAIL_CANDIDATES) ?? '').trim();
@@ -189,7 +221,8 @@ function parseSheet(sheet: XLSX.WorkSheet, sheetName: string): {
 
     const expense = parseCleanNumber(findValue(r, EXPENSE_CANDIDATES)) ?? 0;
     const { status, amountPaid } = parsePaymentInfo(findValue(r, STATUS_CANDIDATES), amount);
-    const date = parseDate(findValue(r, DATE_CANDIDATES));
+    const dateRaw = findValue(r, DATE_CANDIDATES);
+    const date = dateRaw !== undefined ? parseDate(dateRaw) : (sheetMonthFallback ?? parseDate(undefined));
     const service = String(findValue(r, SERVICE_CANDIDATES) ?? '').trim() || 'General Service';
     const servedBy = String(findValue(r, SERVED_BY_CANDIDATES) ?? '').trim() || undefined;
 
