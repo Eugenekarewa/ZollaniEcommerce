@@ -18,6 +18,7 @@ type ImportResult = {
   monthlyBreakdown: MonthBucket[];
   records: ImportRecord[];
   errors: { row: number; reason: string }[];
+  detectedHeaders: string[];
 };
 
 export default function ImportForm() {
@@ -86,8 +87,8 @@ export default function ImportForm() {
           </div>
 
           {result.errors.length > 0 && (
-            <div className="rounded-xl bg-red-50 border border-red-200 p-4">
-              <p className="text-sm font-semibold text-red-700 mb-2 flex items-center gap-1.5">
+            <div className="rounded-xl bg-red-50 border border-red-200 p-4 space-y-3">
+              <p className="text-sm font-semibold text-red-700 flex items-center gap-1.5">
                 <AlertTriangle className="h-4 w-4" /> {result.errors.length} row{result.errors.length !== 1 ? 's' : ''} skipped
               </p>
               <ul className="text-xs text-red-600 space-y-1 max-h-40 overflow-y-auto">
@@ -95,6 +96,19 @@ export default function ImportForm() {
                   <li key={i}>{e.row > 0 ? `Row ${e.row}: ` : ''}{e.reason}</li>
                 ))}
               </ul>
+              {result.errors.length >= result.totalRows / 2 && (
+                <div className="rounded-lg bg-white border border-red-200 p-3 text-xs text-gray-600">
+                  <p className="font-semibold text-charcoal mb-1">Columns detected in your file:</p>
+                  <p className="font-mono">
+                    {result.detectedHeaders.length > 0 ? result.detectedHeaders.join(' · ') : '(none found — is the file empty or in an unsupported format?)'}
+                  </p>
+                  <p className="mt-2 text-gray-500">
+                    If &quot;Name&quot; isn&apos;t in that list, the importer didn&apos;t find your header row —
+                    check there isn&apos;t a title or blank row above your actual column headers, and that
+                    the data is on the first sheet of the file.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

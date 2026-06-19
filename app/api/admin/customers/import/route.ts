@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const { rows, errors } = parseSpreadsheet(buffer);
+    const { rows, errors, detectedHeaders } = parseSpreadsheet(buffer);
 
     let customersCreated = 0;
     let paidCount = 0;
@@ -116,6 +116,7 @@ export async function POST(req: NextRequest) {
       monthlyBreakdown,
       records,
       errors,
+      detectedHeaders,
     });
   } catch (err) {
     return NextResponse.json({ error: friendlyError(err, 'admin/customers/import') }, { status: 400 });
