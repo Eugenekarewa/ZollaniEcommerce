@@ -24,21 +24,24 @@ export default function AddExpenseForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const res = await fetch('/api/admin/expenses', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    if (!res.ok) {
-      const d = await res.json();
-      setError(d.error ?? 'Failed to add expense');
+    try {
+      const res = await fetch('/api/admin/expenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error ?? 'Failed to add expense');
+      }
+      setForm({ category: '', description: '', amount: 0, date: today(), vendor: '' });
+      setOpen(false);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
       setLoading(false);
-      return;
     }
-    setForm({ category: '', description: '', amount: 0, date: today(), vendor: '' });
-    setLoading(false);
-    setOpen(false);
-    router.refresh();
   }
 
   if (!open) {

@@ -15,21 +15,24 @@ export default function StockActions({ itemId, currentQuantity }: { itemId: stri
     if (qty < 1) return;
     setLoading(true);
     setError('');
-    const res = await fetch(`/api/admin/inventory/${itemId}/movements`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, quantity: type === 'restock' ? qty : -qty, note: note || undefined }),
-    });
-    if (!res.ok) {
-      const d = await res.json();
-      setError(d.error ?? 'Failed to update stock');
+    try {
+      const res = await fetch(`/api/admin/inventory/${itemId}/movements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, quantity: type === 'restock' ? qty : -qty, note: note || undefined }),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error ?? 'Failed to update stock');
+      }
+      setQty(1);
+      setNote('');
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
       setLoading(false);
-      return;
     }
-    setQty(1);
-    setNote('');
-    setLoading(false);
-    router.refresh();
   }
 
   return (

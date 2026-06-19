@@ -36,7 +36,7 @@ export default function Charts({
             <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
             <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6B7280' }} />
             <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} tickFormatter={(v) => `${v / 1000}k`} />
-            <Tooltip formatter={(v: number) => formatKes(v)} contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB' }} />
+            <Tooltip formatter={(v) => formatKes(Number(v))} contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB' }} />
             <Legend />
             <Bar dataKey="revenue" name="Revenue" fill={CORAL} radius={[6, 6, 0, 0]} />
             <Bar dataKey="expenses" name="Expenses" fill={CHARCOAL} radius={[6, 6, 0, 0]} />
@@ -77,7 +77,7 @@ export default function Charts({
                 <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 12, fill: '#6B7280' }} tickFormatter={(v) => `${v / 1000}k`} />
                 <YAxis type="category" dataKey="service" width={120} tick={{ fontSize: 12, fill: '#374151' }} />
-                <Tooltip formatter={(v: number) => formatKes(v)} contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB' }} />
+                <Tooltip formatter={(v) => formatKes(Number(v))} contentStyle={{ borderRadius: 12, border: '1px solid #E5E7EB' }} />
                 <Bar dataKey="revenue" name="Revenue" fill={CORAL} radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
